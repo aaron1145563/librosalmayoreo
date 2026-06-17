@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Administrador · Libros al Mayoreo</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--teal:#0e6b5e;--teal-d:#0a5248;--ink:#202229;--gray:#6b7078;--line:#e8e8ea;--soft:#f4f5f6;--yellow:#f0a818;--blue:#1a73e8;--green:#25D366;--red:#e74c3c}
+body{font-family:'Inter',sans-serif;background:var(--soft);color:var(--ink)}
+button{font-family:inherit;cursor:pointer}
+nav{background:var(--teal);color:#fff;position:sticky;top:0;z-index:50}
+.nav-in{max-width:1100px;margin:0 auto;display:flex;align-items:center;padding:14px 20px}
+.nav-in b{font-size:16px;font-weight:700}
+.gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.gate-box{background:#fff;border-radius:16px;padding:40px 32px;width:100%;max-width:360px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.08)}
+.gate-box h2{font-size:20px;margin-bottom:6px}
+.gate-box p{font-size:13px;color:var(--gray);margin-bottom:24px}
+.gate-box input{width:100%;border:1.5px solid var(--line);border-radius:9px;padding:14px;font-size:22px;font-family:inherit;outline:none;text-align:center;letter-spacing:8px;margin-bottom:14px}
+.gate-box input:focus{border-color:var(--teal)}
+.gate-go{width:100%;background:var(--teal);color:#fff;border:none;font-size:14px;font-weight:700;padding:14px;border-radius:9px}
+.gate-go:hover{background:var(--teal-d)}
+.gate-err{color:var(--red);font-size:12px;margin-top:10px;display:none}
+.wrap{max-width:1100px;margin:0 auto;padding:20px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:20px}
+.stat{background:#fff;border-radius:12px;padding:22px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.stat b{font-size:28px;font-weight:800;display:block}
+.stat span{font-size:11px;letter-spacing:2px;color:var(--gray);text-transform:uppercase;font-weight:600}
+.alert-bar{display:none;background:#25a244;color:#fff;padding:14px 20px;border-radius:10px;font-size:14px;font-weight:700;margin-bottom:16px;text-align:center}
+.tabs{display:flex;gap:0;margin-bottom:20px;border-bottom:2px solid var(--line)}
+.tab-btn{background:none;border:none;padding:12px 22px;font-size:13px;font-weight:600;cursor:pointer;color:var(--gray);border-bottom:3px solid transparent;margin-bottom:-2px}
+.tab-btn.on{color:var(--teal);border-bottom-color:var(--teal);font-weight:700}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.filters input{flex:1;min-width:200px;border:1.5px solid var(--line);border-radius:9px;padding:11px 14px;font-size:14px;font-family:inherit;outline:none;background:#fff}
+.filters input:focus{border-color:var(--teal)}
+.filters select{border:1.5px solid var(--line);border-radius:9px;padding:11px 14px;font-size:13px;font-family:inherit;outline:none;background:#fff;font-weight:600}
+.order{background:#fff;border-radius:12px;padding:22px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.05);position:relative}
+.order-acts{position:absolute;top:16px;right:16px;display:flex;gap:8px}
+.act{width:38px;height:38px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;color:#fff;text-decoration:none}
+.act.wa{background:var(--green)}.act.pr{background:#5a6acf}.act.del{background:var(--red)}
+.act svg{width:18px;height:18px;fill:#fff}
+.o-rows{display:grid;grid-template-columns:160px 1fr;gap:5px 12px;font-size:13.5px;margin-bottom:6px;max-width:560px}
+.o-rows b{font-weight:600}.o-rows span{color:#3a3d45}
+.o-total{display:flex;align-items:baseline;gap:14px;margin:12px 0 16px}
+.o-total b{font-size:13.5px;font-weight:600}.o-total span{font-size:24px;font-weight:800}
+.o-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.o-btn{border:none;border-radius:6px;padding:13px 8px;font-size:12px;font-weight:700;text-transform:uppercase;color:#fff}
+.o-btn.ver{background:var(--yellow)}.o-btn.desp{background:var(--blue)}.o-btn.entr{background:#b6b9bf}
+.o-btn.desp.on{outline:3px solid rgba(26,115,232,.3)}.o-btn.entr.on{background:#2e9e5b;outline:3px solid rgba(46,158,91,.3)}
+.o-date{font-size:11.5px;color:var(--gray);text-align:right;margin-top:10px}
+.o-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:12px;margin-bottom:12px}
+.o-badge.nuevo{background:#fff3d6;color:#9a6c00}.o-badge.despachado{background:#dcebff;color:#1a4f9e}.o-badge.entregado{background:#dcf5e5;color:#1c7a43}
+.detail{display:none;position:fixed;inset:0;background:var(--soft);z-index:200;flex-direction:column}
+.detail.open{display:flex}
+.det-nav{background:var(--teal);color:#fff;display:flex;align-items:center;gap:16px;padding:16px 20px;flex-shrink:0}
+.det-nav button{background:none;border:none;color:#fff;cursor:pointer;padding:4px;display:flex}
+.det-nav button svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2.4}
+.det-nav b{font-size:17px;font-weight:700;text-transform:uppercase}
+.det-body{flex:1;overflow-y:auto;padding:20px;max-width:1000px;margin:0 auto;width:100%}
+.det-item{background:#fff;border-radius:10px;padding:14px 16px;margin-bottom:12px;display:flex;gap:16px;align-items:center;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.det-img{width:74px;height:100px;background:#e8e8ea;border-radius:6px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:30px}
+.det-img img{width:100%;height:100%;object-fit:cover}
+.det-info b{font-size:14px;font-weight:700;text-transform:uppercase;display:block;margin-bottom:6px;line-height:1.3}
+.det-info div{font-size:13px;color:#3a3d45;line-height:1.6}
+.det-foot{background:#fff;border-top:1px solid var(--line);padding:18px 20px;flex-shrink:0}
+.det-foot-in{max-width:1000px;margin:0 auto}
+.gr{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.gr b{font-size:13.5px;font-weight:700}
+.gr input{border:1.5px solid var(--line);border-radius:7px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;min-width:180px}
+.gr input:focus{border-color:var(--teal)}
+.det-tot{font-size:14px;font-weight:700;margin-bottom:4px}
+.fb{width:100%;border:none;font-size:14px;font-weight:700;padding:15px;border-radius:6px;text-transform:uppercase;margin-bottom:10px}
+.fb.pri{background:var(--teal);color:#fff}.fb.sec{background:#fff;color:var(--teal);border:2px solid var(--teal)}
+.empty{background:#fff;border-radius:12px;padding:50px;text-align:center;color:var(--gray);font-size:14px}
+.loading{text-align:center;padding:60px;color:var(--gray)}
+
+/* ── PRODUCTOS ─────────────────────────── */
+.prod-top{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.prod-search{flex:1;min-width:200px;border:1.5px solid var(--line);border-radius:9px;padding:11px 14px;font-size:14px;font-family:inherit;outline:none;background:#fff}
+.prod-search:focus{border-color:var(--teal)}
+.prod-act-btn{border:none;border-radius:8px;padding:11px 16px;font-size:12px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.prod-act-btn svg{width:14px;height:14px;fill:#fff}
+.prod-act-btn.imp{background:var(--yellow)}
+.prod-act-btn.bor{background:var(--red)}
+.prod-act-btn.add{background:var(--teal)}
+.prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.prod-card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07);display:flex;flex-direction:column}
+.prod-card-img{width:100%;aspect-ratio:3/4;background:#f0f0f2;display:flex;align-items:center;justify-content:center;font-size:48px;overflow:hidden}
+.prod-card-img img{width:100%;height:100%;object-fit:cover}
+.prod-card-body{padding:12px;flex:1;display:flex;flex-direction:column}
+.prod-card-name{font-size:12.5px;font-weight:700;text-transform:uppercase;line-height:1.3;margin-bottom:4px;color:var(--ink)}
+.prod-card-sub{font-size:11px;color:var(--gray);margin-bottom:8px}
+.prod-card-price{font-size:18px;font-weight:800;color:var(--teal);margin-bottom:10px}
+.prod-card-btns{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:auto}
+.prod-btn{border:none;border-radius:6px;padding:8px;font-size:11px;font-weight:700;cursor:pointer;text-transform:uppercase}
+.prod-btn.edit{background:#fff3d6;color:#9a6c00}
+.prod-btn.del{background:#fde8e8;color:var(--red)}
+
+/* Modal form producto */
+.pf-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:flex-end;justify-content:center}
+.pf-overlay.open{display:flex}
+.pf-box{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:600px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden}
+.pf-head{background:var(--teal);color:#fff;padding:16px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.pf-head button{background:none;border:none;color:#fff;cursor:pointer;display:flex;padding:4px}
+.pf-head button svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2.4}
+.pf-head b{font-size:16px;font-weight:700;text-transform:uppercase}
+.pf-body{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
+.pf-img-prev{width:100%;height:180px;background:#f0f0f2;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:60px;overflow:hidden;margin-bottom:4px;border:2px dashed var(--line)}
+.pf-img-prev img{width:100%;height:100%;object-fit:cover;border-radius:8px}
+.pf-field label{display:block;font-size:12px;font-weight:700;color:var(--gray);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+.pf-field input,.pf-field select,.pf-field textarea{width:100%;border:1.5px solid var(--line);border-radius:8px;padding:11px 14px;font-size:13.5px;font-family:inherit;outline:none;background:#fff;color:var(--ink)}
+.pf-field input:focus,.pf-field select:focus,.pf-field textarea:focus{border-color:var(--teal)}
+.pf-field textarea{resize:vertical;min-height:80px}
+.pf-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pf-foot{padding:16px 20px;border-top:1px solid var(--line);flex-shrink:0;display:flex;gap:10px}
+.pf-save{flex:1;background:var(--teal);color:#fff;border:none;border-radius:8px;padding:14px;font-size:14px;font-weight:700;cursor:pointer}
+.pf-save:hover{background:var(--teal-d)}
+.pf-cancel{background:#fff;color:var(--gray);border:1.5px solid var(--line);border-radius:8px;padding:14px 20px;font-size:14px;font-weight:600;cursor:pointer}
+
+@keyframes fi{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<div class="gate" id="gate">
+  <div class="gate-box">
+    <h2>🔒 Panel de Administrador</h2>
+    <p>Libros al Mayoreo</p>
+    <input type="password" id="pin" placeholder="••••" maxlength="12"/>
+    <button class="gate-go" id="gBtn">Entrar</button>
+    <div class="gate-err" id="gErr">PIN incorrecto</div>
+  </div>
+</div>
+
+<div id="panel" style="display:none">
+  <nav><div class="nav-in"><b>📊 Administrador · Libros al Mayoreo</b></div></nav>
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat"><b id="sV">—</b><span>Visitas</span></div>
+      <div class="stat"><b id="sP">—</b><span>Pedidos</span></div>
+      <div class="stat"><b id="sN">—</b><span>Nuevos</span></div>
+      <div class="stat"><b id="sT">—</b><span>Total Vendido</span></div>
+    </div>
+    <div class="alert-bar" id="aBar"></div>
+    <div class="tabs">
+      <button class="tab-btn on" id="tP" onclick="setTab('p')">Pedidos</button>
+      <button class="tab-btn" id="tC" onclick="setTab('c')">Clientes</button>
+      <button class="tab-btn" id="tProd" onclick="setTab('prod')">📦 Productos</button>
+    </div>
+
+    <!-- PEDIDOS -->
+    <div id="tabPedidos">
+      <div class="filters">
+        <input id="q" placeholder="Cliente / Código pedido" oninput="draw()"/>
+        <select id="est" onchange="draw()">
+          <option value="">TODOS</option>
+          <option value="nuevo">NUEVOS</option>
+          <option value="despachado">DESPACHADOS</option>
+          <option value="entregado">ENTREGADOS</option>
+        </select>
+      </div>
+      <div id="listP"><div class="loading">Cargando pedidos...</div></div>
+    </div>
+
+    <!-- CLIENTES -->
+    <div id="tabClientes" style="display:none">
+      <div class="filters">
+        <input id="qC" placeholder="Buscar cliente..." oninput="drawC()"/>
+      </div>
+      <div id="listC"></div>
+    </div>
+
+    <!-- PRODUCTOS -->
+    <div id="tabProductos" style="display:none">
+      <div class="prod-top">
+        <input class="prod-search" id="qProd" placeholder="🔍 Buscar producto..." oninput="loadProductos()"/>
+        <button class="prod-act-btn imp" onclick="triggerImport()">
+          <svg viewBox="0 0 24 24"><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/></svg>
+          Importar
+        </button>
+        <button class="prod-act-btn bor" onclick="borrarTodos()">
+          <svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+          Borrar todos
+        </button>
+        <button class="prod-act-btn" style="background:#1a7a4a" onclick="publicarCatalogo()">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+          Publicar
+        </button>
+        <button class="prod-act-btn add" onclick="openProdForm()">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          Agregar
+        </button>
+        <input type="file" id="fileImport" accept=".json" style="display:none" onchange="importProds(event)"/>
+      </div>
+      <div id="listProd"><div class="loading">Cargando productos...</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- DETALLE PEDIDO -->
+<div class="detail" id="detail">
+  <div class="det-nav">
+    <button onclick="closeDetail()"><svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
+    <b id="dTitle">VER PEDIDO</b>
+  </div>
+  <div class="det-body" id="dBody"></div>
+  <div class="det-foot"><div class="det-foot-in">
+    <div class="gr"><b>Código de Guía(Opcional):</b><input id="dGuia" placeholder="Ingresa el código"/></div>
+    <div class="gr"><b>Costo de Envío ($):</b><input id="dEnvio" type="number" placeholder="0" style="min-width:140px"/></div>
+    <div class="det-tot">Subtotal: <span id="dSub"></span></div>
+    <div class="det-tot" style="font-size:15px;margin-bottom:14px">Total: <span id="dTot"></span></div>
+    <button class="fb pri" id="dFin" onclick="finalizar()">Finalizar</button>
+    <button class="fb sec" onclick="printNota(detId)">🧾 Imprimir Cotización</button>
+  </div></div>
+</div>
+
+<!-- MODAL PRODUCTO -->
+<div class="pf-overlay" id="pfOverlay">
+  <div class="pf-box">
+    <div class="pf-head">
+      <button onclick="closeProdForm()"><svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
+      <b id="pfTitle">Agregar Producto</b>
+    </div>
+    <div class="pf-body">
+      <!-- Vista previa imagen -->
+      <div class="pf-img-prev" id="pfImgPrev">📕</div>
+
+      <div class="pf-field">
+        <label>Imagen (portada)</label>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input type="url" id="pfImg" placeholder="https://..." oninput="previewImg(this.value)" style="flex:1;min-width:0"/>
+          <label id="imgUploadBtn" style="background:var(--teal);color:#fff;border-radius:8px;padding:11px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            <span id="imgUploadTxt">Subir foto</span>
+            <input type="file" id="imgFileInput" accept="image/*" style="display:none" onchange="uploadImg(this)"/>
+          </label>
+        </div>
+        <div id="imgUploadStatus" style="font-size:12px;color:var(--gray);margin-top:6px;display:none"></div>
+      </div>
+      <div class="pf-row">
+        <div class="pf-field">
+          <label>Código</label>
+          <input type="text" id="pfCodigo" placeholder="Ej. 001"/>
+        </div>
+        <div class="pf-field">
+          <label>Categoría</label>
+          <select id="pfCat">
+            <option value="">— Seleccionar —</option>
+            <option>Novedades</option>
+            <option>General</option>
+            <option>Biblioteca Escolar</option>
+            <option>Grandes de la Literatura</option>
+            <option>Pasta Dura</option>
+            <option>Top 30</option>
+            <option>Ofertas</option>
+            <option>Matiri</option>
+            <option>Varios</option>
+          </select>
+        </div>
+      </div>
+      <div class="pf-field">
+        <label>Nombre / Título</label>
+        <input type="text" id="pfNombre" placeholder="Nombre del libro"/>
+      </div>
+      <div class="pf-field">
+        <label>Descripción (opcional)</label>
+        <textarea id="pfDesc" placeholder="Sinopsis, autor, editorial..."></textarea>
+      </div>
+      <div class="pf-row">
+        <div class="pf-field">
+          <label>Precio Unitario ($)</label>
+          <input type="number" id="pfPrecio" placeholder="0" min="0"/>
+        </div>
+        <div class="pf-field">
+          <label>Precio 2 ($) — opcional</label>
+          <input type="number" id="pfPrecio2" placeholder="0" min="0"/>
+        </div>
+      </div>
+      <div class="pf-row">
+        <div class="pf-field">
+          <label>Precio 3 ($) — opcional</label>
+          <input type="number" id="pfPrecio3" placeholder="0" min="0"/>
+        </div>
+        <div class="pf-field">
+          <label>Stock (opcional)</label>
+          <input type="number" id="pfStock" placeholder="0" min="0"/>
+        </div>
+      </div>
+    </div>
+    <div class="pf-foot">
+      <button class="pf-cancel" onclick="closeProdForm()">Cancelar</button>
+      <button class="pf-save" onclick="saveProd()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var PIN = "1234"; // ← CAMBIA TU PIN AQUI
+
+// ── SUPABASE ─────────────────────────────
+var SUPA_URL="https://nmetrjlkxfgikemrllqf.supabase.co";
+var SUPA_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXRyamxreGZnaWtlbXJsbHFmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTY0NzgzMywiZXhwIjoyMDk3MjIzODMzfQ.v43rDfSwiisBXt_3c8svG_2vvxE6PvAogWbqe0Hij0c";
+
+function supaH(){return{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=representation"};}
+function supaGet(t,q){return fetch(SUPA_URL+"/rest/v1/"+t+(q||""),{headers:supaH()}).then(function(r){return r.json();});}
+function supaInsert(t,d){return fetch(SUPA_URL+"/rest/v1/"+t,{method:"POST",headers:supaH(),body:JSON.stringify(d)}).then(function(r){return r.json();});}
+function supaUpdate(t,f,d){return fetch(SUPA_URL+"/rest/v1/"+t+"?"+f,{method:"PATCH",headers:supaH(),body:JSON.stringify(d)}).then(function(r){return r.json();});}
+function supaDelete(t,f){return fetch(SUPA_URL+"/rest/v1/"+t+"?"+f,{method:"DELETE",headers:supaH()});}
+function supaUpload(bucket,path,body){
+  return fetch(SUPA_URL+"/storage/v1/object/"+bucket+"/"+path,{
+    method:"POST",
+    headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/octet-stream","x-upsert":"true"},
+    body:body
+  });
+}
+
+var ready=false,PEDS=[],PRODS=[],lastN=null,tab="p",detId=null,detMode=null,editProdId=null,_poll=null;
+
+function $$(id){return document.getElementById(id);}
+function money(n){return "$"+(n||0).toLocaleString("es-MX");}
+function fmtD(ts){if(!ts)return"";var d=new Date(ts);return d.toLocaleDateString("es-MX")+" "+d.toLocaleTimeString("es-MX",{hour:"2-digit",minute:"2-digit"});}
+
+function beep(){
+  try{var c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();
+  o.connect(g);g.connect(c.destination);o.frequency.value=880;
+  g.gain.setValueAtTime(0,c.currentTime);g.gain.linearRampToValueAtTime(0.4,c.currentTime+0.05);
+  g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+0.6);o.start();o.stop(c.currentTime+0.6);}catch(e){}
+}
+
+function startFB(){
+  if(ready)return;
+  ready=true;
+  loadPedidos();
+  _poll=setInterval(loadPedidos,30000);
+}
+
+function loadPedidos(){
+  supaGet("pedidos","?order=creado_en.desc").then(function(data){
+    if(!Array.isArray(data))return;
+    PEDS=data;
+    var nv=PEDS.filter(function(p){return p.estado==="nuevo";}).length;
+    if(lastN!==null&&nv>lastN){
+      var b=$$("aBar");b.textContent="🔔 "+(nv-lastN)+" pedido nuevo recibido";
+      b.style.display="block";b.style.animation="fi .3s";beep();
+      setTimeout(function(){b.style.display="none";},5000);
+    }
+    lastN=nv;
+    $$("sP").textContent=PEDS.length;$$("sN").textContent=nv;
+    $$("sT").textContent=money(PEDS.reduce(function(s,p){return s+(p.total||0);},0));
+    supaGet("stats","?id=eq.global").then(function(d){
+      if(d&&d[0])$$("sV").textContent=(d[0].visitas||0).toLocaleString("es-MX");
+    });
+    draw();
+  });
+}
+
+function loadProductos(){
+  var q=($$("qProd").value||"").toLowerCase().trim();
+  var url=SUPA_URL+"/rest/v1/productos?order=creado_en.desc&limit=50";
+  if(q)url+="&or=(nombre.ilike.*"+encodeURIComponent(q)+"*,codigo.ilike.*"+encodeURIComponent(q)+"*)";
+  fetch(url,{headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Prefer":"count=exact"}})
+    .then(function(r){return r.json();})
+    .then(function(data){
+      PRODS=Array.isArray(data)?data:[];
+      drawProds();
+    })
+    .catch(function(e){
+      $$("listProd").innerHTML='<div class="empty" style="color:red">❌ Error: '+e.message+'</div>';
+    });
+}
+
+function doLogin(){
+  if($$("pin").value===PIN){
+    sessionStorage.setItem("ok","1");
+    $$("gate").style.display="none";$$("panel").style.display="block";
+    startFB();
+  } else {
+    $$("gErr").style.display="block";$$("pin").value="";
+  }
+}
+
+$$("gBtn").onclick=doLogin;
+$$("pin").onkeydown=function(e){if(e.key==="Enter")doLogin();};
+
+window.onload=function(){
+  if(sessionStorage.getItem("ok")==="1"){
+    $$("gate").style.display="none";$$("panel").style.display="block";startFB();
+  }
+};
+
+function setTab(t){
+  tab=t;
+  $$("tabPedidos").style.display=t==="p"?"block":"none";
+  $$("tabClientes").style.display=t==="c"?"block":"none";
+  $$("tabProductos").style.display=t==="prod"?"block":"none";
+  $$("tP").className="tab-btn"+(t==="p"?" on":"");
+  $$("tC").className="tab-btn"+(t==="c"?" on":"");
+  $$("tProd").className="tab-btn"+(t==="prod"?" on":"");
+  if(t==="c")drawC();
+  if(t==="prod")drawProds();
+}
+
+/* ── PEDIDOS ──────────────────────────── */
+function draw(){
+  if(tab==="c"){drawC();return;}
+  if(tab==="prod"){drawProds();return;}
+  var q=$$("q").value.toLowerCase(),est=$$("est").value;
+  var list=PEDS.filter(function(p){
+    return(!q||(p.cliente||"").toLowerCase().indexOf(q)>-1||(p.codigo||"").toLowerCase().indexOf(q)>-1)&&(!est||p.estado===est);
+  });
+  if(!list.length){$$("listP").innerHTML='<div class="empty">No hay pedidos.</div>';return;}
+  $$("listP").innerHTML=list.map(function(p){
+    var tel=(p.telefono||"").replace(/[^0-9]/g,"");
+    var wm=encodeURIComponent("Hola "+p.cliente+", te contactamos de Libros al Mayoreo sobre tu pedido "+p.codigo);
+    return '<div class="order">'+
+      '<div class="order-acts">'+
+        (tel?'<a class="act wa" href="https://wa.me/52'+tel+'?text='+wm+'" target="_blank"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 2a10 10 0 00-8.493 15.262L2 22l4.875-1.476A10 10 0 1012 2z"/></svg></a>':'')+
+        '<button class="act pr" onclick="printNota(\''+p.id+'\')"><svg viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6v-8z" fill="none" stroke="#fff" stroke-width="2"/></svg></button>'+
+        '<button class="act del" onclick="delP(\''+p.id+'\')"><svg viewBox="0 0 24 24"><path d="M6 7h12l-1 14H7L6 7zm3-3h6l1 2H8l1-2zM4 5h16v2H4z"/></svg></button>'+
+      '</div>'+
+      '<span class="o-badge '+(p.estado||"nuevo")+'">'+(p.estado||"nuevo")+'</span>'+
+      '<div class="o-rows">'+
+        '<b>Código:</b><span>'+p.codigo+'</span>'+
+        '<b>Cliente:</b><span>'+p.cliente+'</span>'+
+        '<b>Estado:</b><span>'+(p.estado||"—")+'</span>'+
+        '<b>Zona de Entrega:</b><span>'+(p.zona||"—")+'</span>'+
+        '<b>Teléfono:</b><span>'+(p.telefono||"—")+'</span>'+
+        '<b>Email:</b><span>'+(p.email||"—")+'</span>'+
+        '<b>Tipo de Entrega:</b><span>'+(p.tipoEntrega||"—")+'</span>'+
+        '<b>Forma de pago:</b><span>'+(p.formaPago||"—")+'</span>'+
+        (p.notas?'<b>Notas:</b><span>'+p.notas+'</span>':'')+
+      '</div>'+
+      '<div class="o-total"><b>Total:</b><span>'+money(p.total)+'</span><b style="color:var(--gray);font-weight:500">'+(p.piezas||0)+' piezas</b></div>'+
+      '<div class="o-btns">'+
+        '<button class="o-btn ver" onclick="openD(\''+p.id+'\',\'ver\')">1. Ver Pedido</button>'+
+        '<button class="o-btn desp'+(p.estado==="despachado"?" on":"")+'\" onclick="openD(\''+p.id+'\',\'despachado\')">2. Despachado</button>'+
+        '<button class="o-btn entr'+(p.estado==="entregado"?" on":"")+'\" onclick="openD(\''+p.id+'\',\'entregado\')">3. Entregado</button>'+
+      '</div>'+
+      '<div class="o-date">'+fmtD(p.creado_en||p.creadoEn)+'</div>'+
+    '</div>';
+  }).join("");
+}
+
+/* ── CLIENTES ─────────────────────────── */
+function drawC(){
+  var q=$$("qC")?$$("qC").value.toLowerCase():"",map={};
+  PEDS.forEach(function(p){
+    var k=(p.email||p.cliente||"").toLowerCase();
+    if(!map[k])map[k]={nombre:p.cliente,email:p.email||"",tel:p.telefono||"",peds:[],total:0};
+    map[k].peds.push(p);map[k].total+=p.total||0;
+  });
+  var list=Object.values(map).filter(function(c){return!q||c.nombre.toLowerCase().indexOf(q)>-1||c.email.toLowerCase().indexOf(q)>-1;}).sort(function(a,b){return b.total-a.total;});
+  if(!list.length){$$("listC").innerHTML='<div class="empty">No hay clientes.</div>';return;}
+  $$("listC").innerHTML=list.map(function(c){
+    var hist=c.peds.map(function(p){
+      return '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px">'+
+        '<div><b>'+p.codigo+'</b> <span style="color:var(--gray)">· '+fmtD(p.creado_en||p.creadoEn)+'</span></div>'+
+        '<div style="display:flex;gap:8px;align-items:center"><span class="o-badge '+(p.estado||"nuevo")+'">'+(p.estado||"nuevo")+'</span><b>'+money(p.total)+'</b></div></div>';
+    }).join("");
+    return '<div class="order" style="margin-bottom:14px">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:12px">'+
+        '<div><div style="font-size:16px;font-weight:700;margin-bottom:2px">'+c.nombre+'</div>'+
+        '<div style="font-size:12.5px;color:var(--gray)">'+c.email+(c.tel?' · '+c.tel:'')+'</div></div>'+
+        '<div style="text-align:right"><div style="font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:1px">Total comprado</div>'+
+        '<div style="font-size:20px;font-weight:800;color:var(--teal)">'+money(c.total)+'</div>'+
+        '<div style="font-size:11px;color:var(--gray)">'+c.peds.length+' pedido'+(c.peds.length!==1?"s":"")+'</div></div>'+
+      '</div>'+hist+'</div>';
+  }).join("");
+}
+
+/* ── DETALLE PEDIDO ───────────────────── */
+function openD(id,mode){
+  detId=id;detMode=mode;
+  var p=PEDS.find(function(x){return x.id===id;});if(!p)return;
+  $$("dTitle").textContent=mode==="despachado"?"DESPACHADO":mode==="entregado"?"ENTREGADO":"VER PEDIDO";
+  $$("dBody").innerHTML=(p.items||[]).map(function(it){
+    var img=it.img?'<img referrerpolicy="no-referrer" src="'+it.img+'" onerror="this.outerHTML=\'📕\'"/>':'📕';
+    return '<div class="det-item"><div class="det-img">'+img+'</div>'+
+      '<div class="det-info"><b>'+it.titulo+'</b><div>Cantidad '+it.cantidad+'<br>Precio '+money(it.precio)+'<br>Subtotal '+money(it.subtotal)+'</div></div></div>';
+  }).join("");
+  $$("dGuia").value=p.guia||"";$$("dEnvio").value=p.envio||0;
+  var sub=p.total||0,env=p.envio||0;
+  $$("dSub").textContent=money(sub);$$("dTot").textContent=money(sub+env);
+  $$("dFin").textContent=mode==="entregado"?"Confirmar entrega":"Finalizar";
+  $$("detail").classList.add("open");
+}
+function closeDetail(){$$("detail").classList.remove("open");}
+
+function finalizar(){
+  if(!detId)return;
+  var p=PEDS.find(function(x){return x.id===detId;});
+  var guia=$$("dGuia").value.trim(),envio=parseFloat($$("dEnvio").value)||0;
+  var upd={guia:guia,envio:envio};
+  if(detMode==="despachado")upd.estado="despachado";
+  if(detMode==="entregado")upd.estado="entregado";
+  supaUpdate("pedidos","id=eq."+detId,upd).then(function(){
+    closeDetail();
+    if(p&&p.telefono&&(detMode==="despachado"||detMode==="entregado")){
+      var tel=(p.telefono||"").replace(/[^0-9]/g,"");
+      var sub=p.total||0,tot=sub+envio;
+      var EB="\ud83d\udce6",EK="\ud83d\udcda",EC="\u2705",msg;
+      if(detMode==="despachado"){
+        msg="Hola "+p.cliente+"\n\u00a1Tu pedido *"+p.codigo+"* de Libros al Mayoreo ya est\u00e1 paquetado para env\u00edo! "+EB+" Te adjunto tu nota."+
+          (guia?"\nC\u00f3digo de gu\u00eda para rastrearlo: "+guia:"")+
+          "\n\nSub Total: $"+sub.toLocaleString("es-MX")+
+          "\nEnvio: $"+envio.toLocaleString("es-MX")+
+          "\n*Total: $"+tot.toLocaleString("es-MX")+"*"+
+          "\n\n\u00a1Gracias por tu compra! "+EK;
+      } else {
+        msg="Hola "+p.cliente+"\nTu pedido *"+p.codigo+"* fue marcado como *ENTREGADO* "+EC+"\n\u00a1Gracias por comprar en Libros al Mayoreo! "+EK;
+      }
+      window.open("https://wa.me/52"+tel+"?text="+encodeURIComponent(msg),"_blank");
+      if(detMode==="despachado")setTimeout(function(){printNota(p.id);},800);
+    }
+  });
+}
+
+function printNota(id){
+  var p=PEDS.find(function(x){return x.id===id;});if(!p)return;
+  var fecha=p.creado_en?new Date(p.creado_en).toLocaleDateString("es-MX"):new Date().toLocaleDateString("es-MX");
+  var sub=p.total||0,env=p.envio||0,tot=sub+env;
+  var rows=(p.items||[]).map(function(it){
+    return '<tr><td>'+it.titulo.toUpperCase()+'</td><td style="text-align:center">'+(it.codigo||"\u2014")+'</td>'+
+      '<td style="text-align:right">'+it.precio+'</td><td style="text-align:center">'+it.cantidad+'</td>'+
+      '<td style="text-align:center">0</td><td style="text-align:right">$'+it.subtotal.toLocaleString("es-MX")+'</td></tr>';
+  }).join("");
+  var sc="scr"+"ipt",h='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Cotizaci\u00f3n '+p.cliente+'</title>'+
+    '<style>body{font-family:Arial,sans-serif;color:#111;margin:40px;font-size:13px}'+
+    '.hd{display:flex;justify-content:space-between;margin-bottom:8px}'+
+    '.hd-l b{font-size:20px;display:block;margin-bottom:4px}.hd-l div{font-size:11.5px;color:#333;line-height:1.5}'+
+    '.hd-r{text-align:right}.hd-r b{font-size:18px;letter-spacing:2px;display:block}'+
+    '.cli{display:flex;gap:80px;margin:24px 0 18px}.cli b{font-size:11px;letter-spacing:1px;display:block;margin-bottom:5px}'+
+    '.cli div{font-size:12.5px;line-height:1.5;text-transform:uppercase}'+
+    'table{width:100%;border-collapse:collapse}th{font-size:10.5px;text-align:left;border-bottom:2px solid #111;padding:7px 6px}'+
+    'th:nth-child(3),th:nth-child(6){text-align:right}th:nth-child(2),th:nth-child(4),th:nth-child(5){text-align:center}'+
+    'td{font-size:11.5px;padding:7px 6px;border-bottom:1px solid #ddd;text-transform:uppercase;vertical-align:top}'+
+    '.tot{text-align:right;font-size:13px;margin-top:8px}.big{font-size:16px;font-weight:bold;border-top:2px solid #111;padding-top:6px;margin-top:6px}'+
+    '@media print{body{margin:16px}}</style></head><body>'+
+    '<div class="hd"><div class="hd-l"><b>LIBROS AL MAYOREO</b><div>https://librosalmayoreo.store<br>catalogo@librosalmayoreo.com</div></div>'+
+    '<div class="hd-r"><b>COTIZACI\u00d3N</b><div>'+fecha+'</div></div></div>'+
+    '<div class="cli"><div><b>CLIENTE</b><div>'+p.cliente+'<br>'+(p.telefono?'+52'+p.telefono:'')+'</div></div>'+
+    '<div><b>DIRECCION</b><div>'+(p.zona||"\u2014")+'</div></div></div>'+
+    '<table><thead><tr><th>ART\u00cdCULO</th><th>C\u00d3DIGO</th><th>PRECIO</th><th>CANTIDAD</th><th>DESCUENTO</th><th>SUBTOTAL</th></tr></thead>'+
+    '<tbody>'+rows+'</tbody></table>'+
+    '<div class="tot">Sub Total &nbsp; $'+sub.toLocaleString("es-MX")+'</div>'+
+    (env>0?'<div class="tot">Env\u00edo &nbsp; $'+env.toLocaleString("es-MX")+'</div>':'')+
+    '<div class="tot big">Total &nbsp; $'+tot.toLocaleString("es-MX")+'</div>'+
+    '<'+sc+'>window.onload=function(){window.print();}</'+sc+'></body></html>';
+  var w=window.open("","_blank");w.document.write(h);w.document.close();
+}
+
+function delP(id){if(window.confirm("Eliminar este pedido?"))supaDelete("pedidos","id=eq."+id).then(loadPedidos);}
+
+/* ── PRODUCTOS ────────────────────────── */
+function drawProds(){
+  var q=($$("qProd").value||"").toLowerCase().trim();
+  var list=PRODS.filter(function(p){
+    return !q||
+      (p.nombre||"").toLowerCase().indexOf(q)>-1||
+      (p.codigo||"").toLowerCase().indexOf(q)>-1||
+      (p.categoria||"").toLowerCase().indexOf(q)>-1;
+  });
+  if(!list.length){
+    $$("listProd").innerHTML='<div class="empty">📦 No hay productos aún.<br><br><button onclick="openProdForm()" style="background:var(--teal);color:#fff;border:none;border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px">+ Agregar primer producto</button></div>';
+    return;
+  }
+  $$("listProd").innerHTML='<div class="prod-grid">'+list.map(function(p){
+    var imgHtml=p.imagen
+      ?'<img src="'+p.imagen+'" onerror="this.outerHTML=\'📕\'" referrerpolicy="no-referrer"/>'
+      :'📕';
+    return '<div class="prod-card">'+
+      '<div class="prod-card-img">'+imgHtml+'</div>'+
+      '<div class="prod-card-body">'+
+        '<div class="prod-card-name">'+(p.nombre||"Sin nombre")+'</div>'+
+        '<div class="prod-card-sub">'+(p.categoria||"")+(p.codigo?' · '+p.codigo:'')+'</div>'+
+        '<div class="prod-card-price">'+money(p.precio||0)+'</div>'+
+        '<div class="prod-card-btns">'+
+          '<button class="prod-btn edit" onclick="openProdForm(\''+p.id+'\')">✏️ Editar</button>'+
+          '<button class="prod-btn del" onclick="delProd(\''+p.id+'\')">🗑 Borrar</button>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }).join("")+'</div>';
+}
+
+function openProdForm(id){
+  editProdId=id||null;
+  $$("pfTitle").textContent=id?"Editar Producto":"Agregar Producto";
+  // Limpiar campos
+  $$("pfImg").value="";$$("pfCodigo").value="";$$("pfNombre").value="";
+  $$("pfDesc").value="";$$("pfCat").value="";
+  $$("pfPrecio").value="";$$("pfPrecio2").value="";$$("pfPrecio3").value="";
+  $$("pfStock").value="";
+  $$("pfImgPrev").innerHTML="📕";
+
+  if(id){
+    var p=PRODS.find(function(x){return x.id===id;});
+    if(p){
+      $$("pfImg").value=p.imagen||"";
+      $$("pfCodigo").value=p.codigo||"";
+      $$("pfNombre").value=p.nombre||"";
+      $$("pfDesc").value=p.descripcion||"";
+      $$("pfCat").value=p.categoria||"";
+      $$("pfPrecio").value=p.precio||"";
+      $$("pfPrecio2").value=p.precio2||"";
+      $$("pfPrecio3").value=p.precio3||"";
+      $$("pfStock").value=p.stock||"";
+      if(p.imagen)previewImg(p.imagen);
+    }
+  }
+  $$("pfOverlay").classList.add("open");
+}
+
+function closeProdForm(){$$("pfOverlay").classList.remove("open");editProdId=null;}
+
+function previewImg(url){
+  var prev=$$("pfImgPrev");
+  if(!url){prev.innerHTML="📕";return;}
+  prev.innerHTML='<img src="'+url+'" onerror="this.parentElement.innerHTML=\'📕\'" referrerpolicy="no-referrer"/>';
+}
+
+function saveProd(){
+  var nombre=$$("pfNombre").value.trim();
+  if(!nombre){alert("El nombre es obligatorio");return;}
+  var precio=parseFloat($$("pfPrecio").value)||0;
+  if(!precio){alert("El precio es obligatorio");return;}
+
+  var data={
+    nombre:nombre,
+    codigo:$$("pfCodigo").value.trim(),
+    descripcion:$$("pfDesc").value.trim(),
+    categoria:$$("pfCat").value,
+    precio:precio,
+    precio2:parseFloat($$("pfPrecio2").value)||0,
+    precio3:parseFloat($$("pfPrecio3").value)||0,
+    stock:parseInt($$("pfStock").value)||0,
+    imagen:$$("pfImg").value.trim()
+  };
+
+  var btn=$$("pfOverlay").querySelector(".pf-save");
+  btn.textContent="Guardando...";btn.disabled=true;
+
+  var promise=editProdId
+    ?supaUpdate("productos","id=eq."+editProdId,data)
+    :supaInsert("productos",data);
+
+  promise.then(function(){
+    closeProdForm();
+  }).catch(function(e){
+    alert("Error: "+e.message);
+    btn.textContent="💾 Guardar";btn.disabled=false;
+  });
+}
+
+function delProd(id){
+  if(!window.confirm("¿Eliminar este producto?"))return;
+  supaDelete("productos","id=eq."+id).then(loadProductos);
+}
+
+function borrarTodos(){
+  if(!window.confirm("⚠️ ¿Borrar TODOS los productos? Esta acción no se puede deshacer."))return;
+  if(!window.confirm("Confirma nuevamente: ¿borrar todos los productos?"))return;
+  Promise.all(PRODS.map(function(p){return supaDelete("productos","id=eq."+p.id);}))
+    .then(function(){loadProductos();});
+}
+
+function triggerImport(){$$("fileImport").click();}
+
+function importProds(event){
+  var file=event.target.files[0];
+  if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var arr;
+    try{arr=JSON.parse(e.target.result);}catch(ex){alert("Formato JSON inválido");return;}
+    if(!Array.isArray(arr)){alert("El JSON debe ser un array de productos");return;}
+    if(!window.confirm("Se importarán "+arr.length+" productos. ¿Continuar?"))return;
+    var items=[];
+    arr.forEach(function(item){
+      // Soporta formato compacto {k,t,a,c,p,i} y formato completo
+      var nombre=(item.t||item.nombre||item.titulo||"").toString().trim();
+      if(!nombre)return;
+      items.push({
+        nombre:nombre,
+        autor:(item.a||item.autor||"").toString().trim(),
+        codigo:(item.k||item.codigo||item.code||"").toString().trim(),
+        descripcion:(item.descripcion||item.description||"").toString().trim(),
+        categoria:(item.c||item.categoria||"General").toString().trim(),
+        precio:parseFloat(item.p||item.precio||item.price||0),
+        precio2:parseFloat(item.precio2||0),
+        precio3:parseFloat(item.precio3||0),
+        stock:parseInt(item.stock||0),
+        imagen:(item.i||item.imagen||item.img||item.portada||"").toString().trim()
+      });
+    });
+    // Insert in batches of 100
+    var batches=[];
+    for(var i=0;i<items.length;i+=100)batches.push(items.slice(i,i+100));
+    Promise.all(batches.map(function(b){return supaInsert("productos",b);}))
+      .then(function(){
+        alert("✅ "+items.length+" productos importados correctamente.");
+        loadProductos();
+      }).catch(function(e){alert("Error: "+e);});
+  };
+  reader.readAsText(file);
+  event.target.value="";
+}
+
+function publicarCatalogo(){
+  if(!window.confirm("¿Publicar el catálogo? Se tomará el products.json de GitHub y se subirá a Supabase."))return;
+  alert("⏳ Descargando catálogo de GitHub, espera...");
+  // Fetch the full products.json from GitHub Pages
+  fetch("https://aaron1145563.github.io/librosalmayoreo/products.json?t="+Date.now())
+    .then(function(r){return r.text();})
+    .then(function(json){
+      var arr=JSON.parse(json);
+      supaUpload("catalogo","products.json",json)
+        .then(function(r){
+          if(r.ok)alert("✅ Catálogo publicado con "+arr.length+" productos. La tienda se actualizará pronto.");
+          else r.text().then(function(t){alert("❌ Error al publicar: "+t);});
+        }).catch(function(e){alert("❌ Error: "+e);});
+    })
+    .catch(function(e){alert("❌ Error descargando catálogo: "+e);});
+}
+
+var IMGBB_KEY = "684f1dff43d2aef1692a53228e867ead";
+function uploadImg(input) {
+  var file = input.files[0];
+  if (!file) return;
+  if (file.size > 10*1024*1024) { alert("Imagen muy grande, máximo 10MB"); return; }
+  var txt = $$("imgUploadTxt"), btn = $$("imgUploadBtn"), status = $$("imgUploadStatus");
+  txt.textContent = "Subiendo..."; btn.style.opacity = "0.7"; btn.style.pointerEvents = "none";
+  status.style.display = "block"; status.textContent = "⏳ Subiendo imagen..."; status.style.color = "var(--gray)";
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var base64 = e.target.result.split(",")[1];
+    var fd = new FormData(); fd.append("image", base64); fd.append("key", IMGBB_KEY);
+    fetch("https://api.imgbb.com/1/upload", { method:"POST", body:fd })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.success) {
+          $$("pfImg").value = data.data.url;
+          previewImg(data.data.url);
+          status.textContent = "✅ Imagen subida correctamente";
+          status.style.color = "#1a7a4a";
+        } else {
+          status.textContent = "❌ Error al subir imagen";
+          status.style.color = "var(--red)";
+        }
+      })
+      .catch(function() { status.textContent = "❌ Error de conexión"; status.style.color = "var(--red)"; })
+      .finally(function() { txt.textContent = "Subir foto"; btn.style.opacity = "1"; btn.style.pointerEvents = "auto"; input.value = ""; });
+  };
+  reader.readAsDataURL(file);
+}
+</script>
+</body>
+</html>
