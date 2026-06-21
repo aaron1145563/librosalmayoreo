@@ -297,12 +297,14 @@ nav{background:var(--teal);color:#fff;position:sticky;top:0;z-index:50}
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 var PIN = "1234"; // ← CAMBIA TU PIN AQUI
 
 // ── SUPABASE ─────────────────────────────
 var SUPA_URL="https://nmetrjlkxfgikemrllqf.supabase.co";
 var SUPA_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXRyamxreGZnaWtlbXJsbHFmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTY0NzgzMywiZXhwIjoyMDk3MjIzODMzfQ.v43rDfSwiisBXt_3c8svG_2vvxE6PvAogWbqe0Hij0c";
+var supaClient = window.supabase.createClient(SUPA_URL, SUPA_KEY);
 
 function supaH(){return{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=representation"};}
 function supaGet(t,q){return fetch(SUPA_URL+"/rest/v1/"+t+(q||""),{headers:supaH()}).then(function(r){return r.json();});}
@@ -334,7 +336,14 @@ function startFB(){
   if(ready)return;
   ready=true;
   loadPedidos();
-  _poll=setInterval(loadPedidos,30000);
+  // Realtime: recibir cambios de pedidos al instante (reemplaza polling de 30s)
+  supaClient.channel('pedidos-realtime')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'pedidos' }, function() {
+      loadPedidos();
+    })
+    .subscribe();
+  // Fallback: polling cada 60s por si Realtime se desconecta
+  _poll=setInterval(loadPedidos,60000);
 }
 
 function loadPedidos(){
