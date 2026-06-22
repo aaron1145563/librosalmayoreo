@@ -299,20 +299,40 @@ nav{background:var(--teal);color:#fff;position:sticky;top:0;z-index:50}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-var PIN = "1234"; // ← CAMBIA TU PIN AQUI
-
-// ── SUPABASE ─────────────────────────────
+// ── SUPABASE (anon key - segura para frontend) ──
 var SUPA_URL="https://nmetrjlkxfgikemrllqf.supabase.co";
-var SUPA_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXRyamxreGZnaWtlbXJsbHFmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTY0NzgzMywiZXhwIjoyMDk3MjIzODMzfQ.v43rDfSwiisBXt_3c8svG_2vvxE6PvAogWbqe0Hij0c";
+var SUPA_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXRyamxreGZnaWtlbXJsbHFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NDc4MzMsImV4cCI6MjA5NzIyMzgzM30.HPYnk9Tn4XzfyEdXdNGZ0Ar8H2qIdhcHxiyzxL_b8iY";
 var supaClient = window.supabase.createClient(SUPA_URL, SUPA_KEY);
 
 function supaH(){return{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=representation"};}
-function supaGet(t,q){return fetch(SUPA_URL+"/rest/v1/"+t+(q||""),{headers:supaH()}).then(function(r){return r.json();});}
-function supaInsert(t,d){return fetch(SUPA_URL+"/rest/v1/"+t,{method:"POST",headers:supaH(),body:JSON.stringify(d)}).then(function(r){return r.json();});}
-function supaUpdate(t,f,d){return fetch(SUPA_URL+"/rest/v1/"+t+"?"+f,{method:"PATCH",headers:supaH(),body:JSON.stringify(d)}).then(function(r){return r.json();});}
-function supaDelete(t,f){return fetch(SUPA_URL+"/rest/v1/"+t+"?"+f,{method:"DELETE",headers:supaH()});}
+
+// ── LOGGING (Fiabilidad) ──
+function appLog(nivel, mensaje, detalles){
+  fetch(SUPA_URL+"/rest/v1/rpc/app_log",{method:"POST",headers:supaH(),body:JSON.stringify({p_nivel:nivel,p_origen:"admin",p_mensaje:mensaje,p_detalles:detalles||null})}).catch(function(){});
+}
+
+// ── FETCH CON RETRY (Escala/Fallos) ──
+function fetchRetry(url, opts, retries){
+  retries = retries || 3;
+  return fetch(url, opts).then(function(r){
+    if(r.status >= 500 && retries > 1){
+      return new Promise(function(res){ setTimeout(res, 1000); }).then(function(){ return fetchRetry(url, opts, retries-1); });
+    }
+    return r;
+  }).catch(function(err){
+    if(retries > 1){
+      return new Promise(function(res){ setTimeout(res, 1000); }).then(function(){ return fetchRetry(url, opts, retries-1); });
+    }
+    throw err;
+  });
+}
+
+function supaGet(t,q){return fetchRetry(SUPA_URL+"/rest/v1/"+t+(q||""),{headers:supaH()}).then(function(r){return r.json();});}
+function supaInsert(t,d){return fetchRetry(SUPA_URL+"/rest/v1/"+t,{method:"POST",headers:supaH(),body:JSON.stringify(d)}).then(function(r){return r.json();});}
+function supaUpdate(t,f,d){return fetchRetry(SUPA_URL+"/rest/v1/"+t+"?"+f,{method:"PATCH",headers:supaH(),body:JSON.stringify(d)}).then(function(r){return r.json();});}
+function supaDelete(t,f){return fetchRetry(SUPA_URL+"/rest/v1/"+t+"?"+f,{method:"DELETE",headers:supaH()});}
 function supaUpload(bucket,path,body){
-  return fetch(SUPA_URL+"/storage/v1/object/"+bucket+"/"+path,{
+  return fetchRetry(SUPA_URL+"/storage/v1/object/"+bucket+"/"+path,{
     method:"POST",
     headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/octet-stream","x-upsert":"true"},
     body:body
@@ -382,13 +402,35 @@ function loadProductos(){
 }
 
 function doLogin(){
-  if($$("pin").value===PIN){
-    sessionStorage.setItem("ok","1");
-    $$("gate").style.display="none";$$("panel").style.display="block";
-    startFB();
-  } else {
-    $$("gErr").style.display="block";$$("pin").value="";
-  }
+  var pin=$$("pin").value;
+  if(!pin){$$("gErr").textContent="Ingresa el PIN";$$("gErr").style.display="block";return;}
+  var btn=$$("gBtn");btn.textContent="Verificando...";btn.disabled=true;
+  fetch(SUPA_URL+"/rest/v1/rpc/verify_admin_pin",{method:"POST",headers:supaH(),body:JSON.stringify({pin_input:pin})})
+    .then(function(r){return r.json();})
+    .then(function(res){
+      if(res.ok){
+        sessionStorage.setItem("ok","1");
+        sessionStorage.setItem("admin_token",res.token);
+        $$("gate").style.display="none";$$("panel").style.display="block";
+        appLog("info","Admin login exitoso",null);
+        startFB();
+      } else {
+        if(res.error==="bloqueado"){
+          var hasta=new Date(res.hasta);
+          $$("gErr").textContent="Bloqueado hasta "+hasta.toLocaleTimeString("es-MX");
+        } else {
+          $$("gErr").textContent="PIN incorrecto"+(res.intentos?" (intento "+res.intentos+"/5)":"");
+        }
+        $$("gErr").style.display="block";$$("pin").value="";
+        appLog("warn","Intento de login fallido",{intentos:res.intentos||0});
+      }
+    })
+    .catch(function(e){
+      $$("gErr").textContent="Error de conexión. Intenta de nuevo.";
+      $$("gErr").style.display="block";
+      appLog("error","Error en login",{error:e.message});
+    })
+    .finally(function(){btn.textContent="Entrar";btn.disabled=false;});
 }
 
 $$("gBtn").onclick=doLogin;
@@ -777,8 +819,7 @@ function uploadImg(input) {
 
 function actualizarCatalogoStorage(productoGuardado, esEdicion){
   var url = "https://nmetrjlkxfgikemrllqf.supabase.co/storage/v1/object/public/catalogo/products.json";
-  // Descargar el products.json actual
-  fetch(url+"?t="+Date.now())
+  fetchRetry(url+"?t="+Date.now(),{})
     .then(function(r){ return r.json(); })
     .then(function(arr){
       if(!Array.isArray(arr)) arr=[];
@@ -791,23 +832,57 @@ function actualizarCatalogoStorage(productoGuardado, esEdicion){
         i:productoGuardado.imagen||""
       };
       if(esEdicion){
-        // Reemplazar el existente por código
         var idx = arr.findIndex(function(x){ return x.k===nuevoProducto.k; });
         if(idx>=0) arr[idx]=nuevoProducto;
         else arr.push(nuevoProducto);
       } else {
-        // Verificar que no exista ya
         var existe = arr.some(function(x){ return x.k===nuevoProducto.k; });
         if(!existe) arr.push(nuevoProducto);
       }
       var json = JSON.stringify(arr);
       supaUpload("catalogo","products.json",json)
         .then(function(r){
-          if(r.ok) console.log("✅ Catálogo actualizado con "+arr.length+" productos");
+          if(r.ok){
+            console.log("Catálogo actualizado con "+arr.length+" productos");
+            appLog("info","Catálogo actualizado",{total:arr.length,accion:esEdicion?"edicion":"nuevo"});
+          }
         });
     })
-    .catch(function(e){ console.error("Error actualizando catálogo:", e); });
+    .catch(function(e){
+      console.error("Error actualizando catálogo:", e);
+      appLog("error","Error actualizando catálogo",{error:e.message});
+    });
 }
+
+// ── BACKUP AUTOMÁTICO DEL CATÁLOGO (Datos) ──
+function backupCatalogo(){
+  fetch(SUPA_URL+"/rest/v1/rpc/backup_catalogo",{method:"POST",headers:supaH(),body:"{}"})
+    .then(function(r){return r.json();})
+    .then(function(res){
+      if(res.ok) appLog("info","Backup del catálogo creado",{total:res.total});
+    })
+    .catch(function(e){ appLog("error","Error en backup",{error:e.message}); });
+}
+// Backup automático cada vez que se abre el admin
+setTimeout(backupCatalogo, 5000);
+
+// ── MONITOR DE CONEXIÓN (Fiabilidad/Fallos) ──
+var _online = true;
+window.addEventListener("offline", function(){
+  _online = false;
+  var b=$$("aBar");b.textContent="⚠️ Sin conexión a internet";b.style.display="block";b.style.background="#dc2626";
+});
+window.addEventListener("online", function(){
+  _online = true;
+  var b=$$("aBar");b.textContent="✅ Conexión restaurada";b.style.display="block";b.style.background="#25a244";
+  setTimeout(function(){b.style.display="none";},3000);
+  loadPedidos();
+});
+
+// ── ERROR HANDLER GLOBAL (Fiabilidad) ──
+window.onerror = function(msg, src, line){
+  appLog("error","Error JS global",{mensaje:msg,archivo:src,linea:line});
+};
 </script>
 </body>
 </html>

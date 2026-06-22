@@ -377,10 +377,34 @@ var WHATSAPP = "525573253259";
 var SUPA_URL="https://nmetrjlkxfgikemrllqf.supabase.co";
 var SUPA_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXRyamxreGZnaWtlbXJsbHFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NDc4MzMsImV4cCI6MjA5NzIyMzgzM30.HPYnk9Tn4XzfyEdXdNGZ0Ar8H2qIdhcHxiyzxL_b8iY";
 function supaH(extra){return Object.assign({"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=representation"},extra||{});}
-function supaGet(t,q){return fetch(SUPA_URL+"/rest/v1/"+t+(q||""),{headers:supaH()}).then(function(r){return r.json();});}
-function supaPost(t,d){return fetch(SUPA_URL+"/rest/v1/"+t,{method:"POST",headers:supaH(),body:JSON.stringify(d)}).then(function(r){return r.json();});}
-function supaPatch(t,f,d){return fetch(SUPA_URL+"/rest/v1/"+t+"?"+f,{method:"PATCH",headers:supaH(),body:JSON.stringify(d)}).then(function(r){return r.json();});}
 
+// Fetch con retry automático (resiliencia ante fallos)
+function fetchRetry(url, opts, retries){
+  retries = retries || 3;
+  return fetch(url, opts).then(function(r){
+    if(r.status >= 500 && retries > 1){
+      return new Promise(function(res){ setTimeout(res, 1000); }).then(function(){ return fetchRetry(url, opts, retries-1); });
+    }
+    return r;
+  }).catch(function(err){
+    if(retries > 1){
+      return new Promise(function(res){ setTimeout(res, 1000); }).then(function(){ return fetchRetry(url, opts, retries-1); });
+    }
+    throw err;
+  });
+}
+
+function supaGet(t,q){return fetchRetry(SUPA_URL+"/rest/v1/"+t+(q||""),{headers:supaH()}).then(function(r){return r.json();});}
+function supaPost(t,d){return fetchRetry(SUPA_URL+"/rest/v1/"+t,{method:"POST",headers:supaH(),body:JSON.stringify(d)}).then(function(r){return r.json();});}
+function supaPatch(t,f,d){return fetchRetry(SUPA_URL+"/rest/v1/"+t+"?"+f,{method:"PATCH",headers:supaH(),body:JSON.stringify(d)}).then(function(r){return r.json();});}
+
+// Logging remoto
+function appLog(nivel, mensaje, detalles){
+  fetch(SUPA_URL+"/rest/v1/rpc/app_log",{method:"POST",headers:supaH(),body:JSON.stringify({p_nivel:nivel,p_origen:"tienda",p_mensaje:mensaje,p_detalles:detalles||null})}).catch(function(){});
+}
+
+// Error handler global
+window.onerror = function(msg, src, line){ appLog("error","Error JS",{mensaje:msg,archivo:src,linea:line}); };
 
 var BOOKS = [];
 var _booksLoaded = false;
@@ -414,7 +438,7 @@ function _initBooks(data) {
     }
   } catch(e) {}
 
-  fetch(CATALOG_URL)
+  fetchRetry(CATALOG_URL, {})
     .then(function(r) {
       var etag = r.headers.get('ETag') || '';
       return r.json().then(function(data) { return { data: data, etag: etag }; });
@@ -435,7 +459,10 @@ function _initBooks(data) {
       }
     })
     .catch(function(e) {
-      if (!cacheLoaded) console.error('Error cargando productos:', e);
+      appLog("error","Error cargando catálogo",{error:e.message,cache:cacheLoaded});
+      if (!cacheLoaded) {
+        document.getElementById("grid").innerHTML='<div style="text-align:center;padding:40px;color:#888">⚠️ No se pudieron cargar los productos. <button onclick="location.reload()" style="background:#0e6b5e;color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;margin-top:10px;display:block;margin:10px auto">Reintentar</button></div>';
+      }
     });
 })()
 
