@@ -603,7 +603,16 @@ function printNota(id){
   var w=window.open("","_blank");w.document.write(h);w.document.close();
 }
 
-function delP(id){if(window.confirm("Eliminar este pedido?"))supaDelete("pedidos","id=eq."+id).then(loadPedidos);}
+function delP(id){
+  var p=PEDS.find(function(x){return x.id===id;});
+  var nombre=p?p.cliente+" ("+p.codigo+")":"";
+  if(window.confirm("¿Borrar completamente el pedido de "+nombre+"?\n\nEsta acción NO se puede deshacer.")){
+    supaDelete("pedidos","id=eq."+id).then(function(){
+      appLog("info","Pedido eliminado",{id:id,cliente:nombre});
+      loadPedidos();
+    });
+  }
+}
 
 /* ── PRODUCTOS ────────────────────────── */
 function drawProds(){
