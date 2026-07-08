@@ -250,7 +250,7 @@ footer{border-top:1px solid var(--line);margin-top:48px;background:var(--soft)}
     <div class="foot-links">
       <a href="#cat">Catálogo</a>
       <a href="#" onclick="openLogin();return false">Mi cuenta</a>
-      <a href="https://wa.me/525573253259" target="_blank">Contacto</a>
+      <a href="https://wa.me/521234567890" target="_blank">Contacto</a>
       <a href="admin.html">Administrador</a>
     </div>
   </div>
@@ -371,100 +371,36 @@ footer{border-top:1px solid var(--line);margin-top:48px;background:var(--soft)}
 <div class="toast" id="toast"></div>
 
 <script>
-var WHATSAPP = "525573253259";
+var WHATSAPP = "521234567890"; // ← CAMBIA por tu numero
 
 // ══ SUPABASE ══
 var SUPA_URL="https://nmetrjlkxfgikemrllqf.supabase.co";
 var SUPA_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXRyamxreGZnaWtlbXJsbHFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NDc4MzMsImV4cCI6MjA5NzIyMzgzM30.HPYnk9Tn4XzfyEdXdNGZ0Ar8H2qIdhcHxiyzxL_b8iY";
 function supaH(extra){return Object.assign({"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=representation"},extra||{});}
+function supaGet(t,q){return fetch(SUPA_URL+"/rest/v1/"+t+(q||""),{headers:supaH()}).then(function(r){return r.json();});}
+function supaPost(t,d){return fetch(SUPA_URL+"/rest/v1/"+t,{method:"POST",headers:supaH(),body:JSON.stringify(d)}).then(function(r){return r.json();});}
+function supaPatch(t,f,d){return fetch(SUPA_URL+"/rest/v1/"+t+"?"+f,{method:"PATCH",headers:supaH(),body:JSON.stringify(d)}).then(function(r){return r.json();});}
 
-// Fetch con retry automático (resiliencia ante fallos)
-function fetchRetry(url, opts, retries){
-  retries = retries || 3;
-  return fetch(url, opts).then(function(r){
-    if(r.status >= 500 && retries > 1){
-      return new Promise(function(res){ setTimeout(res, 1000); }).then(function(){ return fetchRetry(url, opts, retries-1); });
-    }
-    return r;
-  }).catch(function(err){
-    if(retries > 1){
-      return new Promise(function(res){ setTimeout(res, 1000); }).then(function(){ return fetchRetry(url, opts, retries-1); });
-    }
-    throw err;
-  });
-}
-
-function supaGet(t,q){return fetchRetry(SUPA_URL+"/rest/v1/"+t+(q||""),{headers:supaH()}).then(function(r){return r.json();});}
-function supaPost(t,d){return fetchRetry(SUPA_URL+"/rest/v1/"+t,{method:"POST",headers:supaH(),body:JSON.stringify(d)}).then(function(r){return r.json();});}
-function supaPatch(t,f,d){return fetchRetry(SUPA_URL+"/rest/v1/"+t+"?"+f,{method:"PATCH",headers:supaH(),body:JSON.stringify(d)}).then(function(r){return r.json();});}
-
-// Logging remoto
-function appLog(nivel, mensaje, detalles){
-  fetch(SUPA_URL+"/rest/v1/rpc/app_log",{method:"POST",headers:supaH(),body:JSON.stringify({p_nivel:nivel,p_origen:"tienda",p_mensaje:mensaje,p_detalles:detalles||null})}).catch(function(){});
-}
-
-// Error handler global
-window.onerror = function(msg, src, line){ appLog("error","Error JS",{mensaje:msg,archivo:src,linea:line}); };
 
 var BOOKS = [];
 var _booksLoaded = false;
 var _booksCallbacks = [];
-var CATALOG_URL = 'https://nmetrjlkxfgikemrllqf.supabase.co/storage/v1/object/public/catalogo/products.json';
 
 function onBooksReady(fn) {
   if (_booksLoaded) { fn(); } else { _booksCallbacks.push(fn); }
 }
 
-function _initBooks(data) {
-  BOOKS = data;
-  BOOKS.forEach(function(b,i){ b.id = i; });
-  _booksLoaded = true;
-  _booksCallbacks.forEach(function(fn){ fn(); });
-  _booksCallbacks = [];
-  drawChips(); draw(); drawNov();
-}
-
-// --- CACHING: cargar del cache local primero, luego actualizar en background ---
-(function() {
-  var cacheLoaded = false;
-  try {
-    var cached = localStorage.getItem('books_cache');
-    if (cached) {
-      var parsed = JSON.parse(cached);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        _initBooks(parsed);
-        cacheLoaded = true;
-      }
-    }
-  } catch(e) {}
-
-  fetchRetry(CATALOG_URL, {})
-    .then(function(r) {
-      var etag = r.headers.get('ETag') || '';
-      return r.json().then(function(data) { return { data: data, etag: etag }; });
-    })
-    .then(function(result) {
-      if (!Array.isArray(result.data)) return;
-      var changed = !cacheLoaded || result.data.length !== BOOKS.length;
-      if (!changed && result.etag) {
-        var oldEtag = localStorage.getItem('books_etag') || '';
-        changed = result.etag !== oldEtag;
-      }
-      try {
-        localStorage.setItem('books_cache', JSON.stringify(result.data));
-        if (result.etag) localStorage.setItem('books_etag', result.etag);
-      } catch(e) {}
-      if (changed || !cacheLoaded) {
-        _initBooks(result.data);
-      }
-    })
-    .catch(function(e) {
-      appLog("error","Error cargando catálogo",{error:e.message,cache:cacheLoaded});
-      if (!cacheLoaded) {
-        document.getElementById("grid").innerHTML='<div style="text-align:center;padding:40px;color:#888">⚠️ No se pudieron cargar los productos. <button onclick="location.reload()" style="background:#0e6b5e;color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;margin-top:10px;display:block;margin:10px auto">Reintentar</button></div>';
-      }
-    });
-})()
+fetch('https://nmetrjlkxfgikemrllqf.supabase.co/storage/v1/object/public/catalogo/products.json')
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    BOOKS = data;
+    BOOKS.forEach(function(b,i){b.id=i;});
+    _booksLoaded = true;
+    _booksCallbacks.forEach(function(fn){ fn(); });
+    // Init page after load
+    drawChips(); draw(); drawNov();
+  })
+  .catch(function(e){ console.error('Error cargando productos:', e); })
 
 var CATS = ["Todos","Novedades","General","Biblioteca Escolar","Grandes de la Literatura","Pasta Dura","Top 30","Ofertas","Matiri y Varios"];
 var cat="Todos", PAGE=100, shown=PAGE;
@@ -529,6 +465,9 @@ function drawCart(){
         '<button class="ci-x" onclick="del('+id+')">✕</button></div>';
     }).join("");
 }
+
+var pedidosRef = db.collection("pedidos");
+var statsRef = db.collection("stats").doc("contadores");
 
 // Contador de visitas
 try{
@@ -666,7 +605,7 @@ function doRegister(){
   var btn=document.getElementById("btnReg");
   btn.textContent="Creando cuenta...";btn.disabled=true;
   supaGet("clientes","?email=eq."+encodeURIComponent(email)).then(function(snap){
-    if(!snap.empty){
+    if(snap && snap.length){
       btn.textContent="Crear cuenta";btn.disabled=false;
       toast("Ese correo ya tiene cuenta. Inicia sesión.");
       document.getElementById("email").value=email;
@@ -702,14 +641,13 @@ updateUserUI();
 var toastT;
 function toast(m){var t=document.getElementById("toast");t.textContent=m;t.classList.add("on");clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove("on");},1800);}
 
-// Scroll infinito con Intersection Observer (mas eficiente que listener de scroll)
-var _scrollObserver = new IntersectionObserver(function(entries) {
-  if (entries[0].isIntersecting) {
-    var list = getList();
-    if (list.length > shown) { shown += PAGE; draw(); }
+// Scroll infinito: carga mas libros automaticamente
+window.addEventListener("scroll",function(){
+  if(window.innerHeight + window.scrollY >= document.body.offsetHeight - 900){
+    var list=getList();
+    if(list.length>shown){ shown+=PAGE; draw(); }
   }
-}, { rootMargin: '600px' });
-_scrollObserver.observe(document.getElementById("moreWrap"));
+});
 
 drawCart();
 // drawChips/draw/drawNov called after products.json loads (see fetch callback above)
