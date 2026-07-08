@@ -128,14 +128,15 @@ nav{background:var(--teal);color:#fff;position:sticky;top:0;z-index:50}
   <div class="gate-box">
     <h2>🔒 Panel de Administrador</h2>
     <p>Libros al Mayoreo</p>
-    <input type="password" id="pin" placeholder="••••" maxlength="12"/>
+    <input type="email" id="admEmail" placeholder="correo" autocomplete="username"/>
+    <input type="password" id="pin" placeholder="contraseña" autocomplete="current-password"/>
     <button class="gate-go" id="gBtn">Entrar</button>
-    <div class="gate-err" id="gErr">PIN incorrecto</div>
+    <div class="gate-err" id="gErr">Correo o contraseña incorrectos</div>
   </div>
 </div>
 
 <div id="panel" style="display:none">
-  <nav><div class="nav-in"><b>📊 Administrador · Libros al Mayoreo</b></div></nav>
+  <nav><div class="nav-in"><b>📊 Administrador · Libros al Mayoreo</b><button id="logoutBtn" style="float:right;background:transparent;border:1px solid rgba(255,255,255,.5);color:inherit;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer">Salir</button></div></nav>
   <div class="wrap">
     <div class="stats">
       <div class="stat"><b id="sV">—</b><span>Visitas</span></div>
@@ -297,44 +298,22 @@ nav{background:var(--teal);color:#fff;position:sticky;top:0;z-index:50}
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-// ── SUPABASE (anon key - segura para frontend) ──
+// ── SUPABASE ─────────────────────────────
 var SUPA_URL="https://nmetrjlkxfgikemrllqf.supabase.co";
+// Llave PUBLICA (anon): es segura de exponer. La escritura queda protegida por el login (Supabase Auth) + reglas RLS.
 var SUPA_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXRyamxreGZnaWtlbXJsbHFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NDc4MzMsImV4cCI6MjA5NzIyMzgzM30.HPYnk9Tn4XzfyEdXdNGZ0Ar8H2qIdhcHxiyzxL_b8iY";
-var supaClient = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+var ADMIN_TOKEN=null; // se llena con el token de sesion al iniciar sesion
 
-function supaH(){return{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=representation"};}
-
-// ── LOGGING (Fiabilidad) ──
-function appLog(nivel, mensaje, detalles){
-  fetch(SUPA_URL+"/rest/v1/rpc/app_log",{method:"POST",headers:supaH(),body:JSON.stringify({p_nivel:nivel,p_origen:"admin",p_mensaje:mensaje,p_detalles:detalles||null})}).catch(function(){});
-}
-
-// ── FETCH CON RETRY (Escala/Fallos) ──
-function fetchRetry(url, opts, retries){
-  retries = retries || 3;
-  return fetch(url, opts).then(function(r){
-    if(r.status >= 500 && retries > 1){
-      return new Promise(function(res){ setTimeout(res, 1000); }).then(function(){ return fetchRetry(url, opts, retries-1); });
-    }
-    return r;
-  }).catch(function(err){
-    if(retries > 1){
-      return new Promise(function(res){ setTimeout(res, 1000); }).then(function(){ return fetchRetry(url, opts, retries-1); });
-    }
-    throw err;
-  });
-}
-
-function supaGet(t,q){return fetchRetry(SUPA_URL+"/rest/v1/"+t+(q||""),{headers:supaH()}).then(function(r){return r.json();});}
-function supaInsert(t,d){return fetchRetry(SUPA_URL+"/rest/v1/"+t,{method:"POST",headers:supaH(),body:JSON.stringify(d)}).then(function(r){return r.json();});}
-function supaUpdate(t,f,d){return fetchRetry(SUPA_URL+"/rest/v1/"+t+"?"+f,{method:"PATCH",headers:supaH(),body:JSON.stringify(d)}).then(function(r){return r.json();});}
-function supaDelete(t,f){return fetchRetry(SUPA_URL+"/rest/v1/"+t+"?"+f,{method:"DELETE",headers:supaH()});}
+function supaH(){return{"apikey":SUPA_KEY,"Authorization":"Bearer "+(ADMIN_TOKEN||SUPA_KEY),"Content-Type":"application/json","Prefer":"return=representation"};}
+function supaGet(t,q){return fetch(SUPA_URL+"/rest/v1/"+t+(q||""),{headers:supaH()}).then(function(r){return r.json();});}
+function supaInsert(t,d){return fetch(SUPA_URL+"/rest/v1/"+t,{method:"POST",headers:supaH(),body:JSON.stringify(d)}).then(function(r){return r.json();});}
+function supaUpdate(t,f,d){return fetch(SUPA_URL+"/rest/v1/"+t+"?"+f,{method:"PATCH",headers:supaH(),body:JSON.stringify(d)}).then(function(r){return r.json();});}
+function supaDelete(t,f){return fetch(SUPA_URL+"/rest/v1/"+t+"?"+f,{method:"DELETE",headers:supaH()});}
 function supaUpload(bucket,path,body){
-  return fetchRetry(SUPA_URL+"/storage/v1/object/"+bucket+"/"+path,{
+  return fetch(SUPA_URL+"/storage/v1/object/"+bucket+"/"+path,{
     method:"POST",
-    headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/octet-stream","x-upsert":"true"},
+    headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+(ADMIN_TOKEN||SUPA_KEY),"Content-Type":"application/octet-stream","x-upsert":"true"},
     body:body
   });
 }
@@ -356,14 +335,7 @@ function startFB(){
   if(ready)return;
   ready=true;
   loadPedidos();
-  // Realtime: recibir cambios de pedidos al instante (reemplaza polling de 30s)
-  supaClient.channel('pedidos-realtime')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'pedidos' }, function() {
-      loadPedidos();
-    })
-    .subscribe();
-  // Fallback: polling cada 60s por si Realtime se desconecta
-  _poll=setInterval(loadPedidos,60000);
+  _poll=setInterval(loadPedidos,30000);
 }
 
 function loadPedidos(){
@@ -390,7 +362,7 @@ function loadProductos(){
   var q=($$("qProd").value||"").toLowerCase().trim();
   var url=SUPA_URL+"/rest/v1/productos?order=creado_en.desc&limit=50";
   if(q)url+="&or=(nombre.ilike.*"+encodeURIComponent(q)+"*,codigo.ilike.*"+encodeURIComponent(q)+"*)";
-  fetch(url,{headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Prefer":"count=exact"}})
+  fetch(url,{headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+(ADMIN_TOKEN||SUPA_KEY),"Prefer":"count=exact"}})
     .then(function(r){return r.json();})
     .then(function(data){
       PRODS=Array.isArray(data)?data:[];
@@ -401,45 +373,59 @@ function loadProductos(){
     });
 }
 
-function doLogin(){
-  var pin=$$("pin").value;
-  if(!pin){$$("gErr").textContent="Ingresa el PIN";$$("gErr").style.display="block";return;}
-  var btn=$$("gBtn");btn.textContent="Verificando...";btn.disabled=true;
-  fetch(SUPA_URL+"/rest/v1/rpc/verify_admin_pin",{method:"POST",headers:supaH(),body:JSON.stringify({pin_input:pin})})
-    .then(function(r){return r.json();})
-    .then(function(res){
-      if(res.ok){
-        sessionStorage.setItem("ok","1");
-        sessionStorage.setItem("admin_token",res.token);
-        $$("gate").style.display="none";$$("panel").style.display="block";
-        appLog("info","Admin login exitoso",null);
-        startFB();
-      } else {
-        if(res.error==="bloqueado"){
-          var hasta=new Date(res.hasta);
-          $$("gErr").textContent="Bloqueado hasta "+hasta.toLocaleTimeString("es-MX");
-        } else {
-          $$("gErr").textContent="PIN incorrecto"+(res.intentos?" (intento "+res.intentos+"/5)":"");
-        }
-        $$("gErr").style.display="block";$$("pin").value="";
-        appLog("warn","Intento de login fallido",{intentos:res.intentos||0});
-      }
-    })
-    .catch(function(e){
-      $$("gErr").textContent="Error de conexión. Intenta de nuevo.";
-      $$("gErr").style.display="block";
-      appLog("error","Error en login",{error:e.message});
-    })
-    .finally(function(){btn.textContent="Entrar";btn.disabled=false;});
+// ── AUTENTICACION (Supabase Auth) ────────
+function saveSession(d){
+  ADMIN_TOKEN=d.access_token;
+  try{localStorage.setItem("sb_access",d.access_token);localStorage.setItem("sb_refresh",d.refresh_token);}catch(e){}
 }
+function clearSession(){
+  ADMIN_TOKEN=null;
+  try{localStorage.removeItem("sb_access");localStorage.removeItem("sb_refresh");}catch(e){}
+}
+function showPanel(){$$("gate").style.display="none";$$("panel").style.display="block";startFB();}
+function showGate(){$$("panel").style.display="none";$$("gate").style.display="";}
+
+function doLogin(){
+  var email=($$("admEmail").value||"").trim();
+  var pass=$$("pin").value||"";
+  $$("gErr").style.display="none";
+  if(!email||!pass){$$("gErr").textContent="Escribe tu correo y contraseña";$$("gErr").style.display="block";return;}
+  $$("gBtn").textContent="Entrando...";$$("gBtn").disabled=true;
+  fetch(SUPA_URL+"/auth/v1/token?grant_type=password",{
+    method:"POST",headers:{"apikey":SUPA_KEY,"Content-Type":"application/json"},
+    body:JSON.stringify({email:email,password:pass})
+  }).then(function(r){return r.json();}).then(function(d){
+    $$("gBtn").textContent="Entrar";$$("gBtn").disabled=false;
+    if(d.access_token){saveSession(d);$$("pin").value="";showPanel();}
+    else{$$("gErr").textContent="Correo o contraseña incorrectos";$$("gErr").style.display="block";}
+  }).catch(function(){
+    $$("gBtn").textContent="Entrar";$$("gBtn").disabled=false;
+    $$("gErr").textContent="Error de conexión";$$("gErr").style.display="block";
+  });
+}
+
+function refreshSession(){
+  var rt=null;try{rt=localStorage.getItem("sb_refresh");}catch(e){}
+  if(!rt)return Promise.reject();
+  return fetch(SUPA_URL+"/auth/v1/token?grant_type=refresh_token",{
+    method:"POST",headers:{"apikey":SUPA_KEY,"Content-Type":"application/json"},
+    body:JSON.stringify({refresh_token:rt})
+  }).then(function(r){return r.json();}).then(function(d){
+    if(d.access_token){saveSession(d);return d;}
+    throw new Error("sin sesion");
+  });
+}
+
+function logout(){clearSession();showGate();}
 
 $$("gBtn").onclick=doLogin;
 $$("pin").onkeydown=function(e){if(e.key==="Enter")doLogin();};
+$$("admEmail").onkeydown=function(e){if(e.key==="Enter")doLogin();};
+$$("logoutBtn").onclick=logout;
 
 window.onload=function(){
-  if(sessionStorage.getItem("ok")==="1"){
-    $$("gate").style.display="none";$$("panel").style.display="block";startFB();
-  }
+  refreshSession().then(function(){showPanel();}).catch(function(){showGate();});
+  setInterval(function(){refreshSession().catch(function(){});},45*60*1000);
 };
 
 function setTab(t){
@@ -603,16 +589,7 @@ function printNota(id){
   var w=window.open("","_blank");w.document.write(h);w.document.close();
 }
 
-function delP(id){
-  var p=PEDS.find(function(x){return x.id===id;});
-  var nombre=p?p.cliente+" ("+p.codigo+")":"";
-  if(window.confirm("¿Borrar completamente el pedido de "+nombre+"?\n\nEsta acción NO se puede deshacer.")){
-    supaDelete("pedidos","id=eq."+id).then(function(){
-      appLog("info","Pedido eliminado",{id:id,cliente:nombre});
-      loadPedidos();
-    });
-  }
-}
+function delP(id){if(window.confirm("Eliminar este pedido?"))supaDelete("pedidos","id=eq."+id).then(loadPedidos);}
 
 /* ── PRODUCTOS ────────────────────────── */
 function drawProds(){
@@ -828,7 +805,8 @@ function uploadImg(input) {
 
 function actualizarCatalogoStorage(productoGuardado, esEdicion){
   var url = "https://nmetrjlkxfgikemrllqf.supabase.co/storage/v1/object/public/catalogo/products.json";
-  fetchRetry(url+"?t="+Date.now(),{})
+  // Descargar el products.json actual
+  fetch(url+"?t="+Date.now())
     .then(function(r){ return r.json(); })
     .then(function(arr){
       if(!Array.isArray(arr)) arr=[];
@@ -841,57 +819,23 @@ function actualizarCatalogoStorage(productoGuardado, esEdicion){
         i:productoGuardado.imagen||""
       };
       if(esEdicion){
+        // Reemplazar el existente por código
         var idx = arr.findIndex(function(x){ return x.k===nuevoProducto.k; });
         if(idx>=0) arr[idx]=nuevoProducto;
         else arr.push(nuevoProducto);
       } else {
+        // Verificar que no exista ya
         var existe = arr.some(function(x){ return x.k===nuevoProducto.k; });
         if(!existe) arr.push(nuevoProducto);
       }
       var json = JSON.stringify(arr);
       supaUpload("catalogo","products.json",json)
         .then(function(r){
-          if(r.ok){
-            console.log("Catálogo actualizado con "+arr.length+" productos");
-            appLog("info","Catálogo actualizado",{total:arr.length,accion:esEdicion?"edicion":"nuevo"});
-          }
+          if(r.ok) console.log("✅ Catálogo actualizado con "+arr.length+" productos");
         });
     })
-    .catch(function(e){
-      console.error("Error actualizando catálogo:", e);
-      appLog("error","Error actualizando catálogo",{error:e.message});
-    });
+    .catch(function(e){ console.error("Error actualizando catálogo:", e); });
 }
-
-// ── BACKUP AUTOMÁTICO DEL CATÁLOGO (Datos) ──
-function backupCatalogo(){
-  fetch(SUPA_URL+"/rest/v1/rpc/backup_catalogo",{method:"POST",headers:supaH(),body:"{}"})
-    .then(function(r){return r.json();})
-    .then(function(res){
-      if(res.ok) appLog("info","Backup del catálogo creado",{total:res.total});
-    })
-    .catch(function(e){ appLog("error","Error en backup",{error:e.message}); });
-}
-// Backup automático cada vez que se abre el admin
-setTimeout(backupCatalogo, 5000);
-
-// ── MONITOR DE CONEXIÓN (Fiabilidad/Fallos) ──
-var _online = true;
-window.addEventListener("offline", function(){
-  _online = false;
-  var b=$$("aBar");b.textContent="⚠️ Sin conexión a internet";b.style.display="block";b.style.background="#dc2626";
-});
-window.addEventListener("online", function(){
-  _online = true;
-  var b=$$("aBar");b.textContent="✅ Conexión restaurada";b.style.display="block";b.style.background="#25a244";
-  setTimeout(function(){b.style.display="none";},3000);
-  loadPedidos();
-});
-
-// ── ERROR HANDLER GLOBAL (Fiabilidad) ──
-window.onerror = function(msg, src, line){
-  appLog("error","Error JS global",{mensaje:msg,archivo:src,linea:line});
-};
 </script>
 </body>
 </html>
