@@ -466,8 +466,8 @@ function draw(){
         '<b>Zona de Entrega:</b><span>'+(p.zona||"—")+'</span>'+
         '<b>Teléfono:</b><span>'+(p.telefono||"—")+'</span>'+
         '<b>Email:</b><span>'+(p.email||"—")+'</span>'+
-        '<b>Tipo de Entrega:</b><span>'+(p.tipoEntrega||"—")+'</span>'+
-        '<b>Forma de pago:</b><span>'+(p.formaPago||"—")+'</span>'+
+        '<b>Tipo de Entrega:</b><span>'+(p.tipo_entrega||p.tipoEntrega||"—")+'</span>'+
+        '<b>Forma de pago:</b><span>'+(p.forma_pago||p.formaPago||"—")+'</span>'+
         (p.notas?'<b>Notas:</b><span>'+p.notas+'</span>':'')+
       '</div>'+
       '<div class="o-total"><b>Total:</b><span>'+money(p.total)+'</span><b style="color:var(--gray);font-weight:500">'+(p.piezas||0)+' piezas</b></div>'+
@@ -665,8 +665,10 @@ function saveProd(){
   var precio=parseFloat($$("pfPrecio").value)||0;
   if(!precio){alert("El precio es obligatorio");return;}
 
+  var _prev = editProdId ? (PRODS.find(function(x){return x.id===editProdId;})||{}) : {};
   var data={
     nombre:nombre,
+    autor:_prev.autor||"",
     codigo:$$("pfCodigo").value.trim(),
     descripcion:$$("pfDesc").value.trim(),
     categoria:$$("pfCat").value,

@@ -371,8 +371,6 @@ footer{border-top:1px solid var(--line);margin-top:48px;background:var(--soft)}
 <div class="toast" id="toast"></div>
 
 <script>
-var WHATSAPP = "521234567890"; // ← CAMBIA por tu numero
-
 // ══ SUPABASE ══
 var SUPA_URL="https://nmetrjlkxfgikemrllqf.supabase.co";
 var SUPA_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXRyamxreGZnaWtlbXJsbHFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NDc4MzMsImV4cCI6MjA5NzIyMzgzM30.HPYnk9Tn4XzfyEdXdNGZ0Ar8H2qIdhcHxiyzxL_b8iY";
@@ -466,9 +464,6 @@ function drawCart(){
     }).join("");
 }
 
-var pedidosRef = db.collection("pedidos");
-var statsRef = db.collection("stats").doc("contadores");
-
 // Contador de visitas
 try{
   fetch(SUPA_URL+"/rest/v1/rpc/increment_visitas",{method:"POST",headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json"}}).catch(function(){});
@@ -520,7 +515,6 @@ function confirmOrder(){
     total:t,
     estado:"nuevo"
   }).then(function(){
-    try{supaPatch("stats","id=eq.global",{visitas:0});}catch(e){}
     btn.textContent="Confirmar pedido";btn.disabled=false;
     cart={};drawCart();
     document.getElementById("coForm").style.display="none";
