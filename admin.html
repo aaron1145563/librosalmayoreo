@@ -8,59 +8,178 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--teal:#0e6b5e;--teal-d:#0a5248;--ink:#202229;--gray:#6b7078;--line:#e8e8ea;--soft:#f4f5f6;--yellow:#f0a818;--blue:#1a73e8;--green:#25D366;--red:#e74c3c}
-body{font-family:'Inter',sans-serif;background:var(--soft);color:var(--ink)}
+:root{
+  --head:#0e5e4c;--head-d:#0a4a3b;
+  --acc:#26b45a;--acc-d:#1f9a4c;
+  --ink:#1f2937;--gray:#6b7280;--gray-l:#9aa3ad;
+  --line:#e6e9ee;--bg:#eef1f5;--soft:#f4f6f8;
+  --yellow:#e0a308;--yellow-bg:#fdf3d7;
+  --blue:#2f6fd0;--blue-bg:#dde9fb;
+  --green:#25D366;--red:#e5484d;--green-bg:#dcf5e5;--green-t:#1c7a43;
+  /* alias para no romper estilos viejos */
+  --teal:#0e5e4c;--teal-d:#0a4a3b;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink)}
 button{font-family:inherit;cursor:pointer}
-nav{background:var(--teal);color:#fff;position:sticky;top:0;z-index:50}
-.nav-in{max-width:1100px;margin:0 auto;display:flex;align-items:center;padding:14px 20px}
-.nav-in b{font-size:16px;font-weight:700}
-.gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-.gate-box{background:#fff;border-radius:16px;padding:40px 32px;width:100%;max-width:360px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.08)}
-.gate-box h2{font-size:20px;margin-bottom:6px}
+a{text-decoration:none}
+
+/* ── LOGIN GATE (aspecto; la lógica NO se toca) ── */
+.gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:var(--head)}
+.gate-box{background:#fff;border-radius:20px;padding:40px 32px;width:100%;max-width:360px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+.gate-box .logo{width:64px;height:64px;border-radius:16px;background:var(--head);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.gate-box .logo svg{width:34px;height:34px;stroke:#fff;fill:none;stroke-width:2}
+.gate-box h2{font-size:19px;margin-bottom:4px}
 .gate-box p{font-size:13px;color:var(--gray);margin-bottom:24px}
-.gate-box input{width:100%;border:1.5px solid var(--line);border-radius:9px;padding:14px;font-size:22px;font-family:inherit;outline:none;text-align:center;letter-spacing:8px;margin-bottom:14px}
-.gate-box input:focus{border-color:var(--teal)}
-.gate-go{width:100%;background:var(--teal);color:#fff;border:none;font-size:14px;font-weight:700;padding:14px;border-radius:9px}
-.gate-go:hover{background:var(--teal-d)}
+.gate-box input{width:100%;border:1.5px solid var(--line);border-radius:11px;padding:14px;font-size:16px;font-family:inherit;outline:none;margin-bottom:12px}
+.gate-box input:focus{border-color:var(--acc)}
+.gate-go{width:100%;background:var(--acc);color:#fff;border:none;font-size:15px;font-weight:700;padding:14px;border-radius:11px;margin-top:2px}
+.gate-go:hover{background:var(--acc-d)}
 .gate-err{color:var(--red);font-size:12px;margin-top:10px;display:none}
-.wrap{max-width:1100px;margin:0 auto;padding:20px}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:20px}
-.stat{background:#fff;border-radius:12px;padding:22px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.05)}
-.stat b{font-size:28px;font-weight:800;display:block}
-.stat span{font-size:11px;letter-spacing:2px;color:var(--gray);text-transform:uppercase;font-weight:600}
-.alert-bar{display:none;background:#25a244;color:#fff;padding:14px 20px;border-radius:10px;font-size:14px;font-weight:700;margin-bottom:16px;text-align:center}
-.tabs{display:flex;gap:0;margin-bottom:20px;border-bottom:2px solid var(--line)}
-.tab-btn{background:none;border:none;padding:12px 22px;font-size:13px;font-weight:600;cursor:pointer;color:var(--gray);border-bottom:3px solid transparent;margin-bottom:-2px}
-.tab-btn.on{color:var(--teal);border-bottom-color:var(--teal);font-weight:700}
-.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
-.filters input{flex:1;min-width:200px;border:1.5px solid var(--line);border-radius:9px;padding:11px 14px;font-size:14px;font-family:inherit;outline:none;background:#fff}
-.filters input:focus{border-color:var(--teal)}
-.filters select{border:1.5px solid var(--line);border-radius:9px;padding:11px 14px;font-size:13px;font-family:inherit;outline:none;background:#fff;font-weight:600}
-.order{background:#fff;border-radius:12px;padding:22px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.05);position:relative}
-.order-acts{position:absolute;top:16px;right:16px;display:flex;gap:8px}
-.act{width:38px;height:38px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;color:#fff;text-decoration:none}
-.act.wa{background:var(--green)}.act.pr{background:#5a6acf}.act.del{background:var(--red)}
-.act svg{width:18px;height:18px;fill:#fff}
-.o-rows{display:grid;grid-template-columns:160px 1fr;gap:5px 12px;font-size:13.5px;margin-bottom:6px;max-width:560px}
-.o-rows b{font-weight:600}.o-rows span{color:#3a3d45}
-.o-total{display:flex;align-items:baseline;gap:14px;margin:12px 0 16px}
-.o-total b{font-size:13.5px;font-weight:600}.o-total span{font-size:24px;font-weight:800}
-.o-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.o-btn{border:none;border-radius:6px;padding:13px 8px;font-size:12px;font-weight:700;text-transform:uppercase;color:#fff}
-.o-btn.ver{background:var(--yellow)}.o-btn.desp{background:var(--blue)}.o-btn.entr{background:#b6b9bf}
-.o-btn.desp.on{outline:3px solid rgba(26,115,232,.3)}.o-btn.entr.on{background:#2e9e5b;outline:3px solid rgba(46,158,91,.3)}
-.o-date{font-size:11.5px;color:var(--gray);text-align:right;margin-top:10px}
-.o-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:12px;margin-bottom:12px}
-.o-badge.nuevo{background:#fff3d6;color:#9a6c00}.o-badge.despachado{background:#dcebff;color:#1a4f9e}.o-badge.entregado{background:#dcf5e5;color:#1c7a43}
-.detail{display:none;position:fixed;inset:0;background:var(--soft);z-index:200;flex-direction:column}
+
+/* ── TOP BAR ── */
+.topbar{background:var(--head);color:#fff;position:sticky;top:0;z-index:50;display:flex;align-items:center;padding:0 8px;height:64px;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.ham{background:none;border:none;padding:12px;display:flex;color:#fff}
+.ham svg{width:26px;height:26px;stroke:#fff;fill:none;stroke-width:2.2}
+.topnav{flex:1;display:flex;justify-content:center;gap:8px}
+.tnav{background:none;border:none;color:rgba(255,255,255,.75);display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 22px;border-bottom:3px solid transparent;font-size:12px;font-weight:600}
+.tnav svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.9}
+.tnav.on{color:#fff;border-bottom-color:#fff;font-weight:700}
+.top-r{display:flex;align-items:center}
+#logoutBtn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:9px;padding:8px 14px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+#logoutBtn svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2}
+
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 60px}
+
+/* ── DASHBOARD HEADER ── */
+.dash-card{background:#fff;border-radius:16px;padding:22px 22px 18px;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:16px}
+.dash-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:2px}
+.dash-hi{font-size:24px;font-weight:800;line-height:1.15}
+.dash-sub{font-size:13px;color:var(--gray);margin-top:2px}
+.dash-help{background:var(--acc);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-size:13px;font-weight:700;white-space:nowrap}
+.dash-help:hover{background:var(--acc-d)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:18px}
+.stat{border:1.5px solid var(--line);border-radius:13px;padding:14px 16px;position:relative;text-align:left;background:#fff;transition:.15s}
+.stat:hover{border-color:var(--acc);box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.stat-h{display:flex;align-items:center;gap:8px;color:var(--gray);font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.stat-h svg{width:19px;height:19px;stroke:var(--head);fill:none;stroke-width:1.9}
+.stat-v{font-size:26px;font-weight:800;margin-top:8px;line-height:1}
+.stat-v.ok{color:var(--acc-d)}
+.stat-sub{font-size:11px;font-weight:700;color:var(--red);letter-spacing:.5px;text-transform:uppercase;margin-top:4px;min-height:13px}
+.stat-chev{position:absolute;top:14px;right:12px;color:var(--gray-l)}
+.stat-chev svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.4}
+
+/* ── QUICK ACTIONS ── */
+.qa{background:#fff;border-radius:16px;padding:22px;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:16px}
+.qa-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.qa-head h3{font-size:18px;font-weight:800}
+.qa-gear{display:flex;align-items:center;gap:6px;color:var(--blue);font-size:14px;font-weight:600;background:none;border:none}
+.qa-gear svg{width:18px;height:18px;stroke:var(--blue);fill:none;stroke-width:1.9}
+.qa-txt{font-size:14px;color:var(--gray);margin-bottom:14px}
+.qa-link{display:flex;align-items:center;gap:10px;color:var(--acc-d);font-size:15px;font-weight:700;margin-bottom:16px;word-break:break-all}
+.qa-link svg{width:20px;height:20px;stroke:var(--acc-d);fill:none;stroke-width:2;flex-shrink:0}
+.qa-btns{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.qa-btn{border-radius:11px;padding:14px;font-size:14px;font-weight:700;border:1.5px solid var(--acc)}
+.qa-btn.fill{background:var(--acc);color:#fff;border-color:var(--acc)}
+.qa-btn.fill:hover{background:var(--acc-d)}
+.qa-btn.out{background:#fff;color:var(--ink)}
+.qa-btn.out:hover{background:var(--soft)}
+
+.alert-bar{display:none;background:var(--acc);color:#fff;padding:14px 20px;border-radius:12px;font-size:14px;font-weight:700;margin-bottom:16px;text-align:center}
+
+/* ── SEARCH / FILTER ── */
+.searchbar{background:#fff;border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;align-items:center;gap:10px;padding:4px 16px;margin-bottom:12px}
+.searchbar svg{width:22px;height:22px;stroke:var(--gray-l);fill:none;stroke-width:2;flex-shrink:0}
+.searchbar input{flex:1;border:none;outline:none;padding:14px 0;font-size:15px;font-family:inherit;background:none;color:var(--ink)}
+.filterbar{display:flex;justify-content:space-between;align-items:center;background:#fff;border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.06);padding:12px 18px;margin-bottom:14px}
+.filterbar .fl{display:flex;align-items:center;gap:9px;color:var(--gray);font-size:13px;font-weight:700;letter-spacing:.5px}
+.filterbar .fl svg{width:18px;height:18px;stroke:var(--gray);fill:none;stroke-width:1.9}
+.filterbar select{border:none;background:none;font-family:inherit;font-size:14px;font-weight:800;color:var(--head);outline:none;cursor:pointer;text-transform:uppercase;letter-spacing:.5px}
+
+/* ── ORDER CARD ── */
+.order{background:#fff;border-radius:16px;padding:22px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.o-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}
+.o-name{font-size:19px;font-weight:800;line-height:1.2}
+.o-meta{font-size:12.5px;color:var(--gray-l);margin-top:3px;font-style:italic}
+.o-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:6px 13px;border-radius:20px;white-space:nowrap}
+.o-badge::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.o-badge.nuevo{background:var(--yellow-bg);color:#9a6c00}
+.o-badge.despachado{background:var(--blue-bg);color:var(--blue)}
+.o-badge.entregado{background:var(--green-bg);color:var(--green-t)}
+.o-rows{display:grid;grid-template-columns:190px 1fr;gap:11px 16px;font-size:14px;margin-bottom:8px}
+.o-rows b{font-weight:700;color:var(--gray);font-size:12.5px;letter-spacing:.4px;text-transform:uppercase}
+.o-rows span{color:var(--ink);font-weight:600}
+.o-total-row{display:flex;justify-content:space-between;align-items:baseline;margin:18px 0 4px;padding-top:16px;border-top:1px solid var(--line)}
+.o-total-row .lbl{font-size:13px;font-weight:700;color:var(--gray);letter-spacing:.5px;text-transform:uppercase}
+.o-total-row .amt{font-size:28px;font-weight:800}
+.o-pieces{font-size:12px;color:var(--gray-l);font-weight:600;text-align:right;margin-bottom:6px}
+
+/* ── STEPPER ── */
+.stepper{display:flex;align-items:flex-start;margin:14px 0 4px}
+.step{display:flex;flex-direction:column;align-items:center;gap:7px;flex-shrink:0;width:90px;background:none;border:none;padding:0}
+.step-dot{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid #d3dae1;background:#fff;color:#cbd3db;transition:.15s}
+.step-dot svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:2}
+.step-lbl{font-size:11.5px;font-weight:700;letter-spacing:.4px;color:var(--gray-l);text-transform:uppercase}
+.step.done .step-dot{background:var(--head);border-color:var(--head);color:#fff}
+.step.done .step-lbl{color:var(--head)}
+.step.current .step-dot{background:#fff;border-color:var(--head);color:var(--head);box-shadow:0 0 0 5px rgba(14,94,76,.14)}
+.step.current .step-lbl{color:var(--head)}
+.step.clickable{cursor:pointer}
+.step-line{flex:1;height:3px;background:#e2e7ec;margin-top:23px;border-radius:2px}
+.step-line.done{background:var(--head)}
+.step-hint{display:flex;align-items:center;gap:8px;justify-content:center;color:var(--gray);font-size:13px;font-weight:600;margin:10px 0 4px}
+
+.o-acts{display:flex;justify-content:flex-end;gap:12px;margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+.act{width:44px;height:44px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;text-decoration:none}
+.act svg{width:20px;height:20px}
+.act.wa{background:var(--green-bg)}.act.wa svg{stroke:var(--green-t);fill:none;stroke-width:2}
+.act.pr{background:var(--blue-bg)}.act.pr svg{stroke:var(--blue);fill:none;stroke-width:2}
+.act.del{background:#fde8e8}.act.del svg{stroke:var(--red);fill:none;stroke-width:2}
+
+/* ── CLIENTES ── */
+.cli-card{background:#fff;border-radius:16px;padding:22px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.cli-head{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.cli-name{font-size:18px;font-weight:800}
+.cli-contact{font-size:13px;color:var(--gray);margin-top:2px}
+.cli-tot-lbl{font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:.6px;text-align:right}
+.cli-tot{font-size:22px;font-weight:800;color:var(--acc-d);text-align:right}
+.cli-count{font-size:11px;color:var(--gray-l);text-align:right}
+.cli-hist{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--line);font-size:13.5px}
+
+.empty{background:#fff;border-radius:16px;padding:56px 24px;text-align:center;color:var(--gray);font-size:15px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.loading{text-align:center;padding:60px;color:var(--gray)}
+
+/* ── PRODUCTOS ── */
+.prod-top{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.prod-search{flex:1;min-width:200px;border:none;border-radius:14px;padding:14px 18px;font-size:15px;font-family:inherit;outline:none;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.prod-act-btn{border:none;border-radius:11px;padding:12px 16px;font-size:12.5px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.prod-act-btn svg{width:15px;height:15px;stroke:#fff;fill:none;stroke-width:2}
+.prod-act-btn.imp{background:var(--yellow)}
+.prod-act-btn.bor{background:var(--red)}
+.prod-act-btn.pub{background:var(--blue)}
+.prod-act-btn.add{background:var(--acc)}
+.prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
+.prod-card{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07);display:flex;flex-direction:column}
+.prod-card-img{width:100%;aspect-ratio:3/4;background:#f0f0f2;display:flex;align-items:center;justify-content:center;font-size:48px;overflow:hidden}
+.prod-card-img img{width:100%;height:100%;object-fit:cover}
+.prod-card-body{padding:12px;flex:1;display:flex;flex-direction:column}
+.prod-card-name{font-size:12.5px;font-weight:700;text-transform:uppercase;line-height:1.3;margin-bottom:4px;color:var(--ink)}
+.prod-card-sub{font-size:11px;color:var(--gray);margin-bottom:8px}
+.prod-card-price{font-size:18px;font-weight:800;color:var(--acc-d);margin-bottom:10px}
+.prod-card-btns{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:auto}
+.prod-btn{border:none;border-radius:8px;padding:9px;font-size:11px;font-weight:700;cursor:pointer;text-transform:uppercase}
+.prod-btn.edit{background:var(--yellow-bg);color:#9a6c00}
+.prod-btn.del{background:#fde8e8;color:var(--red)}
+
+/* ── DETALLE PEDIDO ── */
+.detail{display:none;position:fixed;inset:0;background:var(--bg);z-index:200;flex-direction:column}
 .detail.open{display:flex}
-.det-nav{background:var(--teal);color:#fff;display:flex;align-items:center;gap:16px;padding:16px 20px;flex-shrink:0}
+.det-nav{background:var(--head);color:#fff;display:flex;align-items:center;gap:16px;padding:16px 20px;flex-shrink:0}
 .det-nav button{background:none;border:none;color:#fff;cursor:pointer;padding:4px;display:flex}
 .det-nav button svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2.4}
 .det-nav b{font-size:17px;font-weight:700;text-transform:uppercase}
 .det-body{flex:1;overflow-y:auto;padding:20px;max-width:1000px;margin:0 auto;width:100%}
-.det-item{background:#fff;border-radius:10px;padding:14px 16px;margin-bottom:12px;display:flex;gap:16px;align-items:center;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-.det-img{width:74px;height:100px;background:#e8e8ea;border-radius:6px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:30px}
+.det-item{background:#fff;border-radius:12px;padding:14px 16px;margin-bottom:12px;display:flex;gap:16px;align-items:center;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.det-img{width:74px;height:100px;background:#e8e8ea;border-radius:8px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:30px}
 .det-img img{width:100%;height:100%;object-fit:cover}
 .det-info b{font-size:14px;font-weight:700;text-transform:uppercase;display:block;margin-bottom:6px;line-height:1.3}
 .det-info div{font-size:13px;color:#3a3d45;line-height:1.6}
@@ -68,65 +187,75 @@ nav{background:var(--teal);color:#fff;position:sticky;top:0;z-index:50}
 .det-foot-in{max-width:1000px;margin:0 auto}
 .gr{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
 .gr b{font-size:13.5px;font-weight:700}
-.gr input{border:1.5px solid var(--line);border-radius:7px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;min-width:180px}
-.gr input:focus{border-color:var(--teal)}
+.gr input{border:1.5px solid var(--line);border-radius:9px;padding:10px 13px;font-size:13px;font-family:inherit;outline:none;min-width:180px}
+.gr input:focus{border-color:var(--acc)}
 .det-tot{font-size:14px;font-weight:700;margin-bottom:4px}
-.fb{width:100%;border:none;font-size:14px;font-weight:700;padding:15px;border-radius:6px;text-transform:uppercase;margin-bottom:10px}
-.fb.pri{background:var(--teal);color:#fff}.fb.sec{background:#fff;color:var(--teal);border:2px solid var(--teal)}
-.empty{background:#fff;border-radius:12px;padding:50px;text-align:center;color:var(--gray);font-size:14px}
-.loading{text-align:center;padding:60px;color:var(--gray)}
+.fb{width:100%;border:none;font-size:14px;font-weight:700;padding:15px;border-radius:11px;text-transform:uppercase;margin-bottom:10px}
+.fb.pri{background:var(--acc);color:#fff}.fb.pri:hover{background:var(--acc-d)}
+.fb.sec{background:#fff;color:var(--head);border:2px solid var(--head)}
 
-/* ── PRODUCTOS ─────────────────────────── */
-.prod-top{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
-.prod-search{flex:1;min-width:200px;border:1.5px solid var(--line);border-radius:9px;padding:11px 14px;font-size:14px;font-family:inherit;outline:none;background:#fff}
-.prod-search:focus{border-color:var(--teal)}
-.prod-act-btn{border:none;border-radius:8px;padding:11px 16px;font-size:12px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px;white-space:nowrap}
-.prod-act-btn svg{width:14px;height:14px;fill:#fff}
-.prod-act-btn.imp{background:var(--yellow)}
-.prod-act-btn.bor{background:var(--red)}
-.prod-act-btn.add{background:var(--teal)}
-.prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
-.prod-card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07);display:flex;flex-direction:column}
-.prod-card-img{width:100%;aspect-ratio:3/4;background:#f0f0f2;display:flex;align-items:center;justify-content:center;font-size:48px;overflow:hidden}
-.prod-card-img img{width:100%;height:100%;object-fit:cover}
-.prod-card-body{padding:12px;flex:1;display:flex;flex-direction:column}
-.prod-card-name{font-size:12.5px;font-weight:700;text-transform:uppercase;line-height:1.3;margin-bottom:4px;color:var(--ink)}
-.prod-card-sub{font-size:11px;color:var(--gray);margin-bottom:8px}
-.prod-card-price{font-size:18px;font-weight:800;color:var(--teal);margin-bottom:10px}
-.prod-card-btns{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:auto}
-.prod-btn{border:none;border-radius:6px;padding:8px;font-size:11px;font-weight:700;cursor:pointer;text-transform:uppercase}
-.prod-btn.edit{background:#fff3d6;color:#9a6c00}
-.prod-btn.del{background:#fde8e8;color:var(--red)}
-
-/* Modal form producto */
+/* ── MODAL PRODUCTO ── */
 .pf-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:flex-end;justify-content:center}
 .pf-overlay.open{display:flex}
-.pf-box{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:600px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden}
-.pf-head{background:var(--teal);color:#fff;padding:16px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.pf-box{background:#fff;border-radius:22px 22px 0 0;width:100%;max-width:600px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden}
+.pf-head{background:var(--head);color:#fff;padding:16px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0}
 .pf-head button{background:none;border:none;color:#fff;cursor:pointer;display:flex;padding:4px}
 .pf-head button svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2.4}
 .pf-head b{font-size:16px;font-weight:700;text-transform:uppercase}
 .pf-body{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
-.pf-img-prev{width:100%;height:180px;background:#f0f0f2;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:60px;overflow:hidden;margin-bottom:4px;border:2px dashed var(--line)}
-.pf-img-prev img{width:100%;height:100%;object-fit:cover;border-radius:8px}
+.pf-img-prev{width:100%;height:180px;background:#f0f0f2;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:60px;overflow:hidden;margin-bottom:4px;border:2px dashed var(--line)}
+.pf-img-prev img{width:100%;height:100%;object-fit:cover;border-radius:10px}
 .pf-field label{display:block;font-size:12px;font-weight:700;color:var(--gray);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
-.pf-field input,.pf-field select,.pf-field textarea{width:100%;border:1.5px solid var(--line);border-radius:8px;padding:11px 14px;font-size:13.5px;font-family:inherit;outline:none;background:#fff;color:var(--ink)}
-.pf-field input:focus,.pf-field select:focus,.pf-field textarea:focus{border-color:var(--teal)}
+.pf-field input,.pf-field select,.pf-field textarea{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:13.5px;font-family:inherit;outline:none;background:#fff;color:var(--ink)}
+.pf-field input:focus,.pf-field select:focus,.pf-field textarea:focus{border-color:var(--acc)}
 .pf-field textarea{resize:vertical;min-height:80px}
 .pf-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .pf-foot{padding:16px 20px;border-top:1px solid var(--line);flex-shrink:0;display:flex;gap:10px}
-.pf-save{flex:1;background:var(--teal);color:#fff;border:none;border-radius:8px;padding:14px;font-size:14px;font-weight:700;cursor:pointer}
-.pf-save:hover{background:var(--teal-d)}
-.pf-cancel{background:#fff;color:var(--gray);border:1.5px solid var(--line);border-radius:8px;padding:14px 20px;font-size:14px;font-weight:600;cursor:pointer}
+.pf-save{flex:1;background:var(--acc);color:#fff;border:none;border-radius:11px;padding:14px;font-size:14px;font-weight:700;cursor:pointer}
+.pf-save:hover{background:var(--acc-d)}
+.pf-cancel{background:#fff;color:var(--gray);border:1.5px solid var(--line);border-radius:11px;padding:14px 20px;font-size:14px;font-weight:600;cursor:pointer}
 
+/* ── DRAWER ── */
+.drawer-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:120}
+.drawer-ov.open{display:block}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:290px;max-width:84vw;background:#fff;z-index:130;transform:translateX(-100%);transition:transform .25s ease;display:flex;flex-direction:column;box-shadow:2px 0 20px rgba(0,0,0,.15);overflow-y:auto}
+.drawer.open{transform:none}
+.dr-prof{background:var(--head);color:#fff;padding:22px 20px 18px;display:flex;align-items:center;gap:14px}
+.dr-av{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dr-av svg{width:30px;height:30px;stroke:#fff;fill:none;stroke-width:1.8}
+.dr-mail{font-size:13.5px;font-weight:700;word-break:break-all;line-height:1.3}
+.dr-badge{display:inline-block;background:#f0c243;color:#5a3d00;font-size:10px;font-weight:800;letter-spacing:.5px;padding:3px 9px;border-radius:10px;margin-top:6px}
+.dr-plan{margin:12px;border:1.5px solid var(--acc);background:#eafaf0;border-radius:12px;padding:13px 14px;display:flex;align-items:center;gap:12px}
+.dr-plan svg{width:26px;height:26px;stroke:var(--acc-d);fill:none;stroke-width:1.8;flex-shrink:0}
+.dr-plan b{font-size:14px;color:var(--acc-d);display:block}
+.dr-plan span{font-size:11.5px;color:var(--gray)}
+.dr-item{display:flex;align-items:center;gap:16px;padding:15px 22px;background:none;border:none;width:100%;text-align:left;font-size:14.5px;font-weight:600;color:var(--ink)}
+.dr-item svg{width:23px;height:23px;stroke:var(--head);fill:none;stroke-width:1.8;flex-shrink:0}
+.dr-item:hover{background:var(--soft)}
+.dr-item.danger{color:var(--red)}.dr-item.danger svg{stroke:var(--red)}
+.dr-sep{height:1px;background:var(--line);margin:8px 20px}
+
+@media(max-width:560px){
+  .tnav{padding:8px 12px}
+  .tnav span{font-size:11px}
+  #logoutBtn span{display:none}
+  #logoutBtn{padding:8px 10px}
+  .dash-hi{font-size:20px}
+  .o-rows{grid-template-columns:1fr;gap:2px 0}
+  .o-rows b{margin-top:8px}
+  .step{width:70px}
+  .qa-btns{grid-template-columns:1fr}
+}
 @keyframes fi{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
 </style>
 </head>
 <body>
 
+<!-- ══════════ LOGIN (NO MODIFICAR LA LÓGICA) ══════════ -->
 <div class="gate" id="gate">
   <div class="gate-box">
-    <h2>🔒 Panel de Administrador</h2>
+    <div class="logo"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div>
+    <h2>Panel de Administrador</h2>
     <p>Libros al Mayoreo</p>
     <input type="email" id="admEmail" placeholder="correo" autocomplete="username"/>
     <input type="password" id="pin" placeholder="contraseña" autocomplete="current-password"/>
@@ -135,29 +264,105 @@ nav{background:var(--teal);color:#fff;position:sticky;top:0;z-index:50}
   </div>
 </div>
 
-<div id="panel" style="display:none">
-  <nav><div class="nav-in"><b>📊 Administrador · Libros al Mayoreo</b><button id="logoutBtn" style="float:right;background:transparent;border:1px solid rgba(255,255,255,.5);color:inherit;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer">Salir</button></div></nav>
-  <div class="wrap">
-    <div class="stats">
-      <div class="stat"><b id="sV">—</b><span>Visitas</span></div>
-      <div class="stat"><b id="sP">—</b><span>Pedidos</span></div>
-      <div class="stat"><b id="sN">—</b><span>Nuevos</span></div>
-      <div class="stat"><b id="sT">—</b><span>Total Vendido</span></div>
+<!-- ── DRAWER ── -->
+<div class="drawer-ov" id="drawerOv" onclick="toggleMenu()"></div>
+<aside class="drawer" id="drawer">
+  <div class="dr-prof">
+    <div class="dr-av"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 016-6h4a6 6 0 016 6v1"/></svg></div>
+    <div>
+      <div class="dr-mail">catalogo@librosalmayoreo.com</div>
+      <span class="dr-badge">🏪 TIENDA PROPIA</span>
     </div>
-    <div class="alert-bar" id="aBar"></div>
-    <div class="tabs">
-      <button class="tab-btn on" id="tP" onclick="setTab('p')">Pedidos</button>
-      <button class="tab-btn" id="tC" onclick="setTab('c')">Clientes</button>
-      <button class="tab-btn" id="tProd" onclick="setTab('prod')">📦 Productos</button>
-    </div>
+  </div>
+  <div class="dr-plan">
+    <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+    <div><b>Sin membresía</b><span>100% tuya · sin pagos mensuales</span></div>
+  </div>
+  <button class="dr-item" onclick="navTo('p')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/></svg> Inicio</button>
+  <button class="dr-item" onclick="navTo('prod')"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.7l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.7l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><path d="M3.3 7L12 12l8.7-5M12 22V12"/></svg> Productos</button>
+  <button class="dr-item" onclick="navTo('c')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg> Contactos</button>
+  <div class="dr-sep"></div>
+  <button class="dr-item" onclick="openStore()"><svg viewBox="0 0 24 24"><path d="M3 9l1-5h16l1 5M4 9h16v10a1 1 0 01-1 1H5a1 1 0 01-1-1zM9 22V12h6v10"/></svg> Ver mi tienda</button>
+  <button class="dr-item" onclick="publicarCatalogo()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg> Publicar catálogo</button>
+  <div class="dr-sep"></div>
+  <button class="dr-item danger" onclick="cerrarSesion()"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg> Cerrar sesión</button>
+</aside>
 
-    <!-- PEDIDOS -->
+<!-- ── PANEL ── -->
+<div id="panel" style="display:none">
+  <nav class="topbar">
+    <button class="ham" onclick="toggleMenu()"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+    <div class="topnav">
+      <button class="tnav on" id="tP" onclick="setTab('p')"><svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h8M8 14h4"/></svg><span>Vender</span></button>
+      <button class="tnav" id="tProd" onclick="setTab('prod')"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.7l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.7l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><path d="M3.3 7L12 12l8.7-5"/></svg><span>Productos</span></button>
+      <button class="tnav" id="tC" onclick="setTab('c')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/></svg><span>Contactos</span></button>
+    </div>
+    <div class="top-r"><button id="logoutBtn"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg><span>Salir</span></button></div>
+  </nav>
+
+  <div class="wrap">
+    <div class="alert-bar" id="aBar"></div>
+
+    <!-- VENDER / DASHBOARD + PEDIDOS -->
     <div id="tabPedidos">
-      <div class="filters">
+      <div class="dash-card">
+        <div class="dash-top">
+          <div>
+            <div class="dash-hi">Hola, LIBROS AL MAYOREO 👋</div>
+            <div class="dash-sub">Resumen operativo de hoy</div>
+          </div>
+          <button class="dash-help" onclick="openStore()">Ver tienda</button>
+        </div>
+        <div class="stats">
+          <button class="stat" onclick="setTab('p')">
+            <div class="stat-chev"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></div>
+            <div class="stat-h"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"/></svg>Pedidos</div>
+            <div class="stat-v" id="sP">—</div>
+            <div class="stat-sub" id="sNsub"></div>
+          </button>
+          <button class="stat" onclick="setTab('c')">
+            <div class="stat-chev"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></div>
+            <div class="stat-h"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Clientes</div>
+            <div class="stat-v" id="sC">—</div>
+            <div class="stat-sub"></div>
+          </button>
+          <button class="stat" onclick="setTab('p')">
+            <div class="stat-chev"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></div>
+            <div class="stat-h"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Visitas</div>
+            <div class="stat-v" id="sV">—</div>
+            <div class="stat-sub"></div>
+          </button>
+          <button class="stat" onclick="setTab('p')">
+            <div class="stat-chev"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></div>
+            <div class="stat-h"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg>Ventas</div>
+            <div class="stat-v ok" id="sT">—</div>
+            <div class="stat-sub" style="color:var(--gray)" id="sTsub"></div>
+          </button>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-head">
+          <h3>Acciones rápidas del catálogo</h3>
+          <button class="qa-gear" onclick="setTab('prod')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Ajustes</button>
+        </div>
+        <div class="qa-txt">Tu catálogo está listo para vender. ¡Compártelo ahora o mira cómo se ve!</div>
+        <a class="qa-link" href="https://librosalmayoreo.store" target="_blank"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><path d="M16 6l-4-4-4 4M12 2v14"/></svg>https://librosalmayoreo.store</a>
+        <div class="qa-btns">
+          <button class="qa-btn fill" onclick="shareCatalog()">Compartir catálogo</button>
+          <button class="qa-btn out" onclick="openStore()">Ver catálogo</button>
+        </div>
+      </div>
+
+      <div class="searchbar">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
         <input id="q" placeholder="Cliente / Código pedido" oninput="draw()"/>
+      </div>
+      <div class="filterbar">
+        <div class="fl"><svg viewBox="0 0 24 24"><path d="M22 3H2l8 9.5V19l4 2v-8.5L22 3z"/></svg>ESTADO</div>
         <select id="est" onchange="draw()">
           <option value="">TODOS</option>
-          <option value="nuevo">NUEVOS</option>
+          <option value="nuevo">PENDIENTES</option>
           <option value="despachado">DESPACHADOS</option>
           <option value="entregado">ENTREGADOS</option>
         </select>
@@ -165,9 +370,10 @@ nav{background:var(--teal);color:#fff;position:sticky;top:0;z-index:50}
       <div id="listP"><div class="loading">Cargando pedidos...</div></div>
     </div>
 
-    <!-- CLIENTES -->
+    <!-- CONTACTOS / CLIENTES -->
     <div id="tabClientes" style="display:none">
-      <div class="filters">
+      <div class="searchbar">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
         <input id="qC" placeholder="Buscar cliente..." oninput="drawC()"/>
       </div>
       <div id="listC"></div>
@@ -178,21 +384,13 @@ nav{background:var(--teal);color:#fff;position:sticky;top:0;z-index:50}
       <div class="prod-top">
         <input class="prod-search" id="qProd" placeholder="🔍 Buscar producto..." oninput="loadProductos()"/>
         <button class="prod-act-btn imp" onclick="triggerImport()">
-          <svg viewBox="0 0 24 24"><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/></svg>
-          Importar
-        </button>
+          <svg viewBox="0 0 24 24"><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/></svg>Importar</button>
         <button class="prod-act-btn bor" onclick="borrarTodos()">
-          <svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
-          Borrar todos
-        </button>
-        <button class="prod-act-btn" style="background:#1a7a4a" onclick="publicarCatalogo()">
-          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-          Publicar
-        </button>
+          <svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>Borrar todos</button>
+        <button class="prod-act-btn pub" onclick="publicarCatalogo()">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>Publicar</button>
         <button class="prod-act-btn add" onclick="openProdForm()">
-          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-          Agregar
-        </button>
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Agregar</button>
         <input type="file" id="fileImport" accept=".json" style="display:none" onchange="importProds(event)"/>
         <input type="file" id="pubFileInput" accept=".json" style="display:none" onchange="subirCatalogo(this)"/>
       </div>
@@ -209,7 +407,7 @@ nav{background:var(--teal);color:#fff;position:sticky;top:0;z-index:50}
   </div>
   <div class="det-body" id="dBody"></div>
   <div class="det-foot"><div class="det-foot-in">
-    <div class="gr"><b>Código de Guía(Opcional):</b><input id="dGuia" placeholder="Ingresa el código"/></div>
+    <div class="gr"><b>Código de Guía (Opcional):</b><input id="dGuia" placeholder="Ingresa el código"/></div>
     <div class="gr"><b>Costo de Envío ($):</b><input id="dEnvio" type="number" placeholder="0" style="min-width:140px"/></div>
     <div class="det-tot">Subtotal: <span id="dSub"></span></div>
     <div class="det-tot" style="font-size:15px;margin-bottom:14px">Total: <span id="dTot"></span></div>
@@ -226,14 +424,12 @@ nav{background:var(--teal);color:#fff;position:sticky;top:0;z-index:50}
       <b id="pfTitle">Agregar Producto</b>
     </div>
     <div class="pf-body">
-      <!-- Vista previa imagen -->
       <div class="pf-img-prev" id="pfImgPrev">📕</div>
-
       <div class="pf-field">
         <label>Imagen (portada)</label>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <input type="url" id="pfImg" placeholder="https://..." oninput="previewImg(this.value)" style="flex:1;min-width:0"/>
-          <label id="imgUploadBtn" style="background:var(--teal);color:#fff;border-radius:8px;padding:11px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px">
+          <label id="imgUploadBtn" style="background:var(--acc);color:#fff;border-radius:10px;padding:11px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
             <span id="imgUploadTxt">Subir foto</span>
             <input type="file" id="imgFileInput" accept="image/*" style="display:none" onchange="uploadImg(this)"/>
@@ -242,53 +438,25 @@ nav{background:var(--teal);color:#fff;position:sticky;top:0;z-index:50}
         <div id="imgUploadStatus" style="font-size:12px;color:var(--gray);margin-top:6px;display:none"></div>
       </div>
       <div class="pf-row">
-        <div class="pf-field">
-          <label>Código</label>
-          <input type="text" id="pfCodigo" placeholder="Ej. 001"/>
-        </div>
-        <div class="pf-field">
-          <label>Categoría</label>
+        <div class="pf-field"><label>Código</label><input type="text" id="pfCodigo" placeholder="Ej. 001"/></div>
+        <div class="pf-field"><label>Categoría</label>
           <select id="pfCat">
             <option value="">— Seleccionar —</option>
-            <option>Novedades</option>
-            <option>General</option>
-            <option>Biblioteca Escolar</option>
-            <option>Grandes de la Literatura</option>
-            <option>Pasta Dura</option>
-            <option>Top 30</option>
-            <option>Ofertas</option>
-            <option>Matiri</option>
-            <option>Varios</option>
+            <option>Novedades</option><option>General</option><option>Biblioteca Escolar</option>
+            <option>Grandes de la Literatura</option><option>Pasta Dura</option><option>Top 30</option>
+            <option>Ofertas</option><option>Matiri</option><option>Varios</option>
           </select>
         </div>
       </div>
-      <div class="pf-field">
-        <label>Nombre / Título</label>
-        <input type="text" id="pfNombre" placeholder="Nombre del libro"/>
-      </div>
-      <div class="pf-field">
-        <label>Descripción (opcional)</label>
-        <textarea id="pfDesc" placeholder="Sinopsis, autor, editorial..."></textarea>
+      <div class="pf-field"><label>Nombre / Título</label><input type="text" id="pfNombre" placeholder="Nombre del libro"/></div>
+      <div class="pf-field"><label>Descripción (opcional)</label><textarea id="pfDesc" placeholder="Sinopsis, autor, editorial..."></textarea></div>
+      <div class="pf-row">
+        <div class="pf-field"><label>Precio Unitario ($)</label><input type="number" id="pfPrecio" placeholder="0" min="0"/></div>
+        <div class="pf-field"><label>Precio 2 ($) — opcional</label><input type="number" id="pfPrecio2" placeholder="0" min="0"/></div>
       </div>
       <div class="pf-row">
-        <div class="pf-field">
-          <label>Precio Unitario ($)</label>
-          <input type="number" id="pfPrecio" placeholder="0" min="0"/>
-        </div>
-        <div class="pf-field">
-          <label>Precio 2 ($) — opcional</label>
-          <input type="number" id="pfPrecio2" placeholder="0" min="0"/>
-        </div>
-      </div>
-      <div class="pf-row">
-        <div class="pf-field">
-          <label>Precio 3 ($) — opcional</label>
-          <input type="number" id="pfPrecio3" placeholder="0" min="0"/>
-        </div>
-        <div class="pf-field">
-          <label>Stock (opcional)</label>
-          <input type="number" id="pfStock" placeholder="0" min="0"/>
-        </div>
+        <div class="pf-field"><label>Precio 3 ($) — opcional</label><input type="number" id="pfPrecio3" placeholder="0" min="0"/></div>
+        <div class="pf-field"><label>Stock (opcional)</label><input type="number" id="pfStock" placeholder="0" min="0"/></div>
       </div>
     </div>
     <div class="pf-foot">
@@ -299,7 +467,9 @@ nav{background:var(--teal);color:#fff;position:sticky;top:0;z-index:50}
 </div>
 
 <script>
-// ── SUPABASE ─────────────────────────────
+// ══════════════════════════════════════════════════════
+// SUPABASE + LOGIN  ·  ⚠️ NO MODIFICAR (inicio de sesión)
+// ══════════════════════════════════════════════════════
 var SUPA_URL="https://nmetrjlkxfgikemrllqf.supabase.co";
 // Llave PUBLICA (anon): es segura de exponer. La escritura queda protegida por el login (Supabase Auth) + reglas RLS.
 var SUPA_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXRyamxreGZnaWtlbXJsbHFmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NDc4MzMsImV4cCI6MjA5NzIyMzgzM30.HPYnk9Tn4XzfyEdXdNGZ0Ar8H2qIdhcHxiyzxL_b8iY";
@@ -318,62 +488,7 @@ function supaUpload(bucket,path,body){
   });
 }
 
-var ready=false,PEDS=[],PRODS=[],lastN=null,tab="p",detId=null,detMode=null,editProdId=null,_poll=null;
-
-function $$(id){return document.getElementById(id);}
-function money(n){return "$"+(n||0).toLocaleString("es-MX");}
-function fmtD(ts){if(!ts)return"";var d=new Date(ts);return d.toLocaleDateString("es-MX")+" "+d.toLocaleTimeString("es-MX",{hour:"2-digit",minute:"2-digit"});}
-
-function beep(){
-  try{var c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();
-  o.connect(g);g.connect(c.destination);o.frequency.value=880;
-  g.gain.setValueAtTime(0,c.currentTime);g.gain.linearRampToValueAtTime(0.4,c.currentTime+0.05);
-  g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+0.6);o.start();o.stop(c.currentTime+0.6);}catch(e){}
-}
-
-function startFB(){
-  if(ready)return;
-  ready=true;
-  loadPedidos();
-  _poll=setInterval(loadPedidos,30000);
-}
-
-function loadPedidos(){
-  supaGet("pedidos","?order=creado_en.desc").then(function(data){
-    if(!Array.isArray(data))return;
-    PEDS=data;
-    var nv=PEDS.filter(function(p){return p.estado==="nuevo";}).length;
-    if(lastN!==null&&nv>lastN){
-      var b=$$("aBar");b.textContent="🔔 "+(nv-lastN)+" pedido nuevo recibido";
-      b.style.display="block";b.style.animation="fi .3s";beep();
-      setTimeout(function(){b.style.display="none";},5000);
-    }
-    lastN=nv;
-    $$("sP").textContent=PEDS.length;$$("sN").textContent=nv;
-    $$("sT").textContent=money(PEDS.reduce(function(s,p){return s+(p.total||0);},0));
-    supaGet("stats","?id=eq.global").then(function(d){
-      if(d&&d[0])$$("sV").textContent=(d[0].visitas||0).toLocaleString("es-MX");
-    });
-    draw();
-  });
-}
-
-function loadProductos(){
-  var q=($$("qProd").value||"").toLowerCase().trim();
-  var url=SUPA_URL+"/rest/v1/productos?order=creado_en.desc&limit=50";
-  if(q)url+="&or=(nombre.ilike.*"+encodeURIComponent(q)+"*,codigo.ilike.*"+encodeURIComponent(q)+"*)";
-  fetch(url,{headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+(ADMIN_TOKEN||SUPA_KEY),"Prefer":"count=exact"}})
-    .then(function(r){return r.json();})
-    .then(function(data){
-      PRODS=Array.isArray(data)?data:[];
-      drawProds();
-    })
-    .catch(function(e){
-      $$("listProd").innerHTML='<div class="empty" style="color:red">❌ Error: '+e.message+'</div>';
-    });
-}
-
-// ── AUTENTICACION (Supabase Auth) ────────
+// ── AUTENTICACION (Supabase Auth) · NO MODIFICAR ──
 function saveSession(d){
   ADMIN_TOKEN=d.access_token;
   try{localStorage.setItem("sb_access",d.access_token);localStorage.setItem("sb_refresh",d.refresh_token);}catch(e){}
@@ -427,20 +542,99 @@ window.onload=function(){
   refreshSession().then(function(){showPanel();}).catch(function(){showGate();});
   setInterval(function(){refreshSession().catch(function(){});},45*60*1000);
 };
+// ══════════════ FIN LOGIN (no modificar arriba) ══════════════
+
+var ready=false,PEDS=[],PRODS=[],lastN=null,tab="p",detId=null,detMode=null,editProdId=null,_poll=null;
+var STORE_URL="https://librosalmayoreo.store";
+
+function $$(id){return document.getElementById(id);}
+function money(n){return "$"+(n||0).toLocaleString("es-MX");}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];});}
+function fmtD(ts){if(!ts)return"";var d=new Date(ts);return d.toLocaleDateString("es-MX")+" "+d.toLocaleTimeString("es-MX",{hour:"2-digit",minute:"2-digit"});}
+
+function beep(){
+  try{var c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();
+  o.connect(g);g.connect(c.destination);o.frequency.value=880;
+  g.gain.setValueAtTime(0,c.currentTime);g.gain.linearRampToValueAtTime(0.4,c.currentTime+0.05);
+  g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+0.6);o.start();o.stop(c.currentTime+0.6);}catch(e){}
+}
+
+/* ── MENÚ LATERAL ── */
+function toggleMenu(){
+  var open=$$("drawer").classList.toggle("open");
+  $$("drawerOv").classList.toggle("open",open);
+}
+function navTo(t){setTab(t);toggleMenu();}
+function openStore(){window.open(STORE_URL,"_blank");}
+function shareCatalog(){
+  var txt="Mira nuestro catálogo de Libros al Mayoreo 📚 "+STORE_URL;
+  if(navigator.share){navigator.share({title:"Libros al Mayoreo",text:txt,url:STORE_URL}).catch(function(){});}
+  else{window.open("https://wa.me/?text="+encodeURIComponent(txt),"_blank");}
+}
+function cerrarSesion(){toggleMenu();logout();}
+
+function startFB(){
+  if(ready)return;
+  ready=true;
+  loadPedidos();
+  _poll=setInterval(loadPedidos,30000);
+}
+
+function loadPedidos(){
+  supaGet("pedidos","?order=creado_en.desc").then(function(data){
+    if(!Array.isArray(data))return;
+    PEDS=data;
+    var nv=PEDS.filter(function(p){return p.estado==="nuevo";}).length;
+    if(lastN!==null&&nv>lastN){
+      var b=$$("aBar");b.textContent="🔔 "+(nv-lastN)+" pedido nuevo recibido";
+      b.style.display="block";b.style.animation="fi .3s";beep();
+      setTimeout(function(){b.style.display="none";},5000);
+    }
+    lastN=nv;
+    $$("sP").textContent=PEDS.length;
+    $$("sNsub").textContent=nv>0?(nv+" nuevo"+(nv!==1?"s":"")):"";
+    var cli={};PEDS.forEach(function(p){cli[(p.email||p.cliente||"").toLowerCase()]=1;});
+    $$("sC").textContent=Object.keys(cli).length;
+    var now=new Date(),mesTot=0;
+    PEDS.forEach(function(p){var d=new Date(p.creado_en||p.creadoEn);if(d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear())mesTot+=p.total||0;});
+    $$("sT").textContent=money(mesTot);
+    $$("sTsub").textContent=now.toLocaleDateString("es-MX",{month:"long"}).toUpperCase();
+    supaGet("stats","?id=eq.global").then(function(d){
+      if(d&&d[0])$$("sV").textContent=(d[0].visitas||0).toLocaleString("es-MX");
+    });
+    draw();
+  });
+}
+
+function loadProductos(){
+  var q=($$("qProd").value||"").toLowerCase().trim();
+  var url=SUPA_URL+"/rest/v1/productos?order=creado_en.desc&limit=50";
+  if(q)url+="&or=(nombre.ilike.*"+encodeURIComponent(q)+"*,codigo.ilike.*"+encodeURIComponent(q)+"*)";
+  fetch(url,{headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+(ADMIN_TOKEN||SUPA_KEY),"Prefer":"count=exact"}})
+    .then(function(r){return r.json();})
+    .then(function(data){PRODS=Array.isArray(data)?data:[];drawProds();})
+    .catch(function(e){$$("listProd").innerHTML='<div class="empty" style="color:red">❌ Error: '+esc(e.message)+'</div>';});
+}
 
 function setTab(t){
   tab=t;
   $$("tabPedidos").style.display=t==="p"?"block":"none";
   $$("tabClientes").style.display=t==="c"?"block":"none";
   $$("tabProductos").style.display=t==="prod"?"block":"none";
-  $$("tP").className="tab-btn"+(t==="p"?" on":"");
-  $$("tC").className="tab-btn"+(t==="c"?" on":"");
-  $$("tProd").className="tab-btn"+(t==="prod"?" on":"");
+  $$("tP").className="tnav"+(t==="p"?" on":"");
+  $$("tC").className="tnav"+(t==="c"?" on":"");
+  $$("tProd").className="tnav"+(t==="prod"?" on":"");
   if(t==="c")drawC();
-  if(t==="prod")drawProds();
+  if(t==="prod"){if(!PRODS.length)loadProductos();else drawProds();}
+  window.scrollTo(0,0);
 }
 
-/* ── PEDIDOS ──────────────────────────── */
+/* ── ICONOS STEPPER ── */
+var IC_CLOCK='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+var IC_TRUCK='<svg viewBox="0 0 24 24"><path d="M1 3h15v13H1zM16 8h4l3 3v5h-7"/><circle cx="5.5" cy="18.5" r="2"/><circle cx="18.5" cy="18.5" r="2"/></svg>';
+var IC_PKG='<svg viewBox="0 0 24 24"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg>';
+
+/* ── PEDIDOS ── */
 function draw(){
   if(tab==="c"){drawC();return;}
   if(tab==="prod"){drawProds();return;}
@@ -451,37 +645,50 @@ function draw(){
   if(!list.length){$$("listP").innerHTML='<div class="empty">No hay pedidos.</div>';return;}
   $$("listP").innerHTML=list.map(function(p){
     var tel=(p.telefono||"").replace(/[^0-9]/g,"");
+    var est=p.estado||"nuevo";
+    var lbl=est==="nuevo"?"PENDIENTE":est.toUpperCase();
     var wm=encodeURIComponent("Hola "+p.cliente+", te contactamos de Libros al Mayoreo sobre tu pedido "+p.codigo);
+    var lvl=est==="entregado"?2:est==="despachado"?1:0;
+    function step(i,label,icon,mode){
+      var cls="step"+(i<lvl?" done":i===lvl?" current":"")+(mode?" clickable":"");
+      var on=mode?' onclick="openD(\''+p.id+'\',\''+mode+'\')"':"";
+      return '<'+(mode?"button":"div")+' class="'+cls+'"'+on+'><div class="step-dot">'+icon+'</div><div class="step-lbl">'+label+'</div></'+(mode?"button":"div")+'>';
+    }
     return '<div class="order">'+
-      '<div class="order-acts">'+
-        (tel?'<a class="act wa" href="https://wa.me/52'+tel+'?text='+wm+'" target="_blank"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 2a10 10 0 00-8.493 15.262L2 22l4.875-1.476A10 10 0 1012 2z"/></svg></a>':'')+
-        '<button class="act pr" onclick="printNota(\''+p.id+'\')"><svg viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6v-8z" fill="none" stroke="#fff" stroke-width="2"/></svg></button>'+
-        '<button class="act del" onclick="delP(\''+p.id+'\')"><svg viewBox="0 0 24 24"><path d="M6 7h12l-1 14H7L6 7zm3-3h6l1 2H8l1-2zM4 5h16v2H4z"/></svg></button>'+
+      '<div class="o-top">'+
+        '<div><div class="o-name">'+esc(p.cliente||"Cliente")+'</div>'+
+        '<div class="o-meta">#'+esc(p.codigo)+' · '+fmtD(p.creado_en||p.creadoEn)+'</div></div>'+
+        '<span class="o-badge '+est+'">'+lbl+'</span>'+
       '</div>'+
-      '<span class="o-badge '+(p.estado||"nuevo")+'">'+(p.estado||"nuevo")+'</span>'+
       '<div class="o-rows">'+
-        '<b>Código:</b><span>'+p.codigo+'</span>'+
-        '<b>Cliente:</b><span>'+p.cliente+'</span>'+
-        '<b>Estado:</b><span>'+(p.estado||"—")+'</span>'+
-        '<b>Zona de Entrega:</b><span>'+(p.zona||"—")+'</span>'+
-        '<b>Teléfono:</b><span>'+(p.telefono||"—")+'</span>'+
-        '<b>Email:</b><span>'+(p.email||"—")+'</span>'+
-        '<b>Tipo de Entrega:</b><span>'+(p.tipo_entrega||p.tipoEntrega||"—")+'</span>'+
-        '<b>Forma de pago:</b><span>'+(p.forma_pago||p.formaPago||"—")+'</span>'+
-        (p.notas?'<b>Notas:</b><span>'+p.notas+'</span>':'')+
+        '<b>Zona de entrega</b><span>'+esc(p.zona||"—")+'</span>'+
+        '<b>Teléfono</b><span>'+esc(p.telefono||"—")+'</span>'+
+        '<b>Email</b><span>'+esc(p.email||"—")+'</span>'+
+        (p.notas?'<b>Información adicional</b><span>'+esc(p.notas)+'</span>':'')+
+        '<b>Tipo de entrega</b><span>'+esc(p.tipo_entrega||p.tipoEntrega||"—")+'</span>'+
+        '<b>Forma de pago</b><span>'+esc(p.forma_pago||p.formaPago||"—")+'</span>'+
       '</div>'+
-      '<div class="o-total"><b>Total:</b><span>'+money(p.total)+'</span><b style="color:var(--gray);font-weight:500">'+(p.piezas||0)+' piezas</b></div>'+
-      '<div class="o-btns">'+
-        '<button class="o-btn ver" onclick="openD(\''+p.id+'\',\'ver\')">1. Ver Pedido</button>'+
-        '<button class="o-btn desp'+(p.estado==="despachado"?" on":"")+'\" onclick="openD(\''+p.id+'\',\'despachado\')">2. Despachado</button>'+
-        '<button class="o-btn entr'+(p.estado==="entregado"?" on":"")+'\" onclick="openD(\''+p.id+'\',\'entregado\')">3. Entregado</button>'+
+      '<div class="o-total-row"><span class="lbl">Total</span><span class="amt">'+money(p.total)+'</span></div>'+
+      '<div class="o-pieces">'+(p.piezas||0)+' piezas</div>'+
+      '<div class="stepper">'+
+        step(0,"Pendiente",IC_CLOCK,null)+
+        '<div class="step-line'+(lvl>=1?" done":"")+'"></div>'+
+        step(1,"Despachado",IC_TRUCK,"despachado")+
+        '<div class="step-line'+(lvl>=2?" done":"")+'"></div>'+
+        step(2,"Entregado",IC_PKG,"entregado")+
       '</div>'+
-      '<div class="o-date">'+fmtD(p.creado_en||p.creadoEn)+'</div>'+
+      '<div class="step-hint">✋ Toca el siguiente estado para avanzar el pedido</div>'+
+      '<div class="o-acts">'+
+        '<button class="act pr" onclick="openD(\''+p.id+'\',\'ver\')" title="Ver pedido"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>'+
+        (tel?'<a class="act wa" href="https://wa.me/52'+tel+'?text='+wm+'" target="_blank" title="WhatsApp"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 01-12.3 7.4L3 21l2.2-5.6A8.4 8.4 0 1121 11.5z"/></svg></a>':'')+
+        '<button class="act pr" onclick="printNota(\''+p.id+'\')" title="Imprimir"><svg viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg></button>'+
+        '<button class="act del" onclick="delP(\''+p.id+'\')" title="Eliminar"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>'+
+      '</div>'+
     '</div>';
   }).join("");
 }
 
-/* ── CLIENTES ─────────────────────────── */
+/* ── CLIENTES ── */
 function drawC(){
   var q=$$("qC")?$$("qC").value.toLowerCase():"",map={};
   PEDS.forEach(function(p){
@@ -493,30 +700,31 @@ function drawC(){
   if(!list.length){$$("listC").innerHTML='<div class="empty">No hay clientes.</div>';return;}
   $$("listC").innerHTML=list.map(function(c){
     var hist=c.peds.map(function(p){
-      return '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px">'+
-        '<div><b>'+p.codigo+'</b> <span style="color:var(--gray)">· '+fmtD(p.creado_en||p.creadoEn)+'</span></div>'+
-        '<div style="display:flex;gap:8px;align-items:center"><span class="o-badge '+(p.estado||"nuevo")+'">'+(p.estado||"nuevo")+'</span><b>'+money(p.total)+'</b></div></div>';
+      var est=p.estado||"nuevo",lbl=est==="nuevo"?"PENDIENTE":est.toUpperCase();
+      return '<div class="cli-hist">'+
+        '<div><b>#'+esc(p.codigo)+'</b> <span style="color:var(--gray-l);font-style:italic">· '+fmtD(p.creado_en||p.creadoEn)+'</span></div>'+
+        '<div style="display:flex;gap:10px;align-items:center"><span class="o-badge '+est+'">'+lbl+'</span><b>'+money(p.total)+'</b></div></div>';
     }).join("");
-    return '<div class="order" style="margin-bottom:14px">'+
-      '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:12px">'+
-        '<div><div style="font-size:16px;font-weight:700;margin-bottom:2px">'+c.nombre+'</div>'+
-        '<div style="font-size:12.5px;color:var(--gray)">'+c.email+(c.tel?' · '+c.tel:'')+'</div></div>'+
-        '<div style="text-align:right"><div style="font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:1px">Total comprado</div>'+
-        '<div style="font-size:20px;font-weight:800;color:var(--teal)">'+money(c.total)+'</div>'+
-        '<div style="font-size:11px;color:var(--gray)">'+c.peds.length+' pedido'+(c.peds.length!==1?"s":"")+'</div></div>'+
+    return '<div class="cli-card">'+
+      '<div class="cli-head">'+
+        '<div><div class="cli-name">'+esc(c.nombre)+'</div>'+
+        '<div class="cli-contact">'+esc(c.email)+(c.tel?' · '+esc(c.tel):'')+'</div></div>'+
+        '<div><div class="cli-tot-lbl">Total comprado</div>'+
+        '<div class="cli-tot">'+money(c.total)+'</div>'+
+        '<div class="cli-count">'+c.peds.length+' pedido'+(c.peds.length!==1?"s":"")+'</div></div>'+
       '</div>'+hist+'</div>';
   }).join("");
 }
 
-/* ── DETALLE PEDIDO ───────────────────── */
+/* ── DETALLE PEDIDO ── */
 function openD(id,mode){
   detId=id;detMode=mode;
   var p=PEDS.find(function(x){return x.id===id;});if(!p)return;
   $$("dTitle").textContent=mode==="despachado"?"DESPACHADO":mode==="entregado"?"ENTREGADO":"VER PEDIDO";
   $$("dBody").innerHTML=(p.items||[]).map(function(it){
-    var img=it.img?'<img referrerpolicy="no-referrer" src="'+it.img+'" onerror="this.outerHTML=\'📕\'"/>':'📕';
+    var img=it.img?'<img referrerpolicy="no-referrer" src="'+esc(it.img)+'" onerror="this.outerHTML=\'📕\'"/>':'📕';
     return '<div class="det-item"><div class="det-img">'+img+'</div>'+
-      '<div class="det-info"><b>'+it.titulo+'</b><div>Cantidad '+it.cantidad+'<br>Precio '+money(it.precio)+'<br>Subtotal '+money(it.subtotal)+'</div></div></div>';
+      '<div class="det-info"><b>'+esc(it.titulo)+'</b><div>Cantidad '+(+it.cantidad||0)+'<br>Precio '+money(it.precio)+'<br>Subtotal '+money(it.subtotal)+'</div></div></div>';
   }).join("");
   $$("dGuia").value=p.guia||"";$$("dEnvio").value=p.envio||0;
   var sub=p.total||0,env=p.envio||0;
@@ -534,20 +742,20 @@ function finalizar(){
   if(detMode==="despachado")upd.estado="despachado";
   if(detMode==="entregado")upd.estado="entregado";
   supaUpdate("pedidos","id=eq."+detId,upd).then(function(){
-    closeDetail();
+    closeDetail();loadPedidos();
     if(p&&p.telefono&&(detMode==="despachado"||detMode==="entregado")){
       var tel=(p.telefono||"").replace(/[^0-9]/g,"");
       var sub=p.total||0,tot=sub+envio;
-      var EB="\ud83d\udce6",EK="\ud83d\udcda",EC="\u2705",msg;
+      var EB="📦",EK="📚",EC="✅",msg;
       if(detMode==="despachado"){
-        msg="Hola "+p.cliente+"\n\u00a1Tu pedido *"+p.codigo+"* de Libros al Mayoreo ya est\u00e1 paquetado para env\u00edo! "+EB+" Te adjunto tu nota."+
-          (guia?"\nC\u00f3digo de gu\u00eda para rastrearlo: "+guia:"")+
+        msg="Hola "+p.cliente+"\n¡Tu pedido *"+p.codigo+"* de Libros al Mayoreo ya está paquetado para envío! "+EB+" Te adjunto tu nota."+
+          (guia?"\nCódigo de guía para rastrearlo: "+guia:"")+
           "\n\nSub Total: $"+sub.toLocaleString("es-MX")+
           "\nEnvio: $"+envio.toLocaleString("es-MX")+
           "\n*Total: $"+tot.toLocaleString("es-MX")+"*"+
-          "\n\n\u00a1Gracias por tu compra! "+EK;
+          "\n\n¡Gracias por tu compra! "+EK;
       } else {
-        msg="Hola "+p.cliente+"\nTu pedido *"+p.codigo+"* fue marcado como *ENTREGADO* "+EC+"\n\u00a1Gracias por comprar en Libros al Mayoreo! "+EK;
+        msg="Hola "+p.cliente+"\nTu pedido *"+p.codigo+"* fue marcado como *ENTREGADO* "+EC+"\n¡Gracias por comprar en Libros al Mayoreo! "+EK;
       }
       window.open("https://wa.me/52"+tel+"?text="+encodeURIComponent(msg),"_blank");
       if(detMode==="despachado")setTimeout(function(){printNota(p.id);},800);
@@ -560,11 +768,11 @@ function printNota(id){
   var fecha=p.creado_en?new Date(p.creado_en).toLocaleDateString("es-MX"):new Date().toLocaleDateString("es-MX");
   var sub=p.total||0,env=p.envio||0,tot=sub+env;
   var rows=(p.items||[]).map(function(it){
-    return '<tr><td>'+it.titulo.toUpperCase()+'</td><td style="text-align:center">'+(it.codigo||"\u2014")+'</td>'+
-      '<td style="text-align:right">'+it.precio+'</td><td style="text-align:center">'+it.cantidad+'</td>'+
-      '<td style="text-align:center">0</td><td style="text-align:right">$'+it.subtotal.toLocaleString("es-MX")+'</td></tr>';
+    return '<tr><td>'+esc(String(it.titulo||"").toUpperCase())+'</td><td style="text-align:center">'+esc(it.codigo||"—")+'</td>'+
+      '<td style="text-align:right">'+(+it.precio||0)+'</td><td style="text-align:center">'+(+it.cantidad||0)+'</td>'+
+      '<td style="text-align:center">0</td><td style="text-align:right">$'+(+it.subtotal||0).toLocaleString("es-MX")+'</td></tr>';
   }).join("");
-  var sc="scr"+"ipt",h='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Cotizaci\u00f3n '+p.cliente+'</title>'+
+  var sc="scr"+"ipt",h='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Cotización '+esc(p.cliente)+'</title>'+
     '<style>body{font-family:Arial,sans-serif;color:#111;margin:40px;font-size:13px}'+
     '.hd{display:flex;justify-content:space-between;margin-bottom:8px}'+
     '.hd-l b{font-size:20px;display:block;margin-bottom:4px}.hd-l div{font-size:11.5px;color:#333;line-height:1.5}'+
@@ -577,13 +785,13 @@ function printNota(id){
     '.tot{text-align:right;font-size:13px;margin-top:8px}.big{font-size:16px;font-weight:bold;border-top:2px solid #111;padding-top:6px;margin-top:6px}'+
     '@media print{body{margin:16px}}</style></head><body>'+
     '<div class="hd"><div class="hd-l"><b>LIBROS AL MAYOREO</b><div>https://librosalmayoreo.store<br>catalogo@librosalmayoreo.com</div></div>'+
-    '<div class="hd-r"><b>COTIZACI\u00d3N</b><div>'+fecha+'</div></div></div>'+
-    '<div class="cli"><div><b>CLIENTE</b><div>'+p.cliente+'<br>'+(p.telefono?'+52'+p.telefono:'')+'</div></div>'+
-    '<div><b>DIRECCION</b><div>'+(p.zona||"\u2014")+'</div></div></div>'+
-    '<table><thead><tr><th>ART\u00cdCULO</th><th>C\u00d3DIGO</th><th>PRECIO</th><th>CANTIDAD</th><th>DESCUENTO</th><th>SUBTOTAL</th></tr></thead>'+
+    '<div class="hd-r"><b>COTIZACIÓN</b><div>'+fecha+'</div></div></div>'+
+    '<div class="cli"><div><b>CLIENTE</b><div>'+esc(p.cliente)+'<br>'+(p.telefono?'+52'+esc(p.telefono):'')+'</div></div>'+
+    '<div><b>DIRECCION</b><div>'+esc(p.zona||"—")+'</div></div></div>'+
+    '<table><thead><tr><th>ARTÍCULO</th><th>CÓDIGO</th><th>PRECIO</th><th>CANTIDAD</th><th>DESCUENTO</th><th>SUBTOTAL</th></tr></thead>'+
     '<tbody>'+rows+'</tbody></table>'+
     '<div class="tot">Sub Total &nbsp; $'+sub.toLocaleString("es-MX")+'</div>'+
-    (env>0?'<div class="tot">Env\u00edo &nbsp; $'+env.toLocaleString("es-MX")+'</div>':'')+
+    (env>0?'<div class="tot">Envío &nbsp; $'+env.toLocaleString("es-MX")+'</div>':'')+
     '<div class="tot big">Total &nbsp; $'+tot.toLocaleString("es-MX")+'</div>'+
     '<'+sc+'>window.onload=function(){window.print();}</'+sc+'></body></html>';
   var w=window.open("","_blank");w.document.write(h);w.document.close();
@@ -591,28 +799,23 @@ function printNota(id){
 
 function delP(id){if(window.confirm("Eliminar este pedido?"))supaDelete("pedidos","id=eq."+id).then(loadPedidos);}
 
-/* ── PRODUCTOS ────────────────────────── */
+/* ── PRODUCTOS ── */
 function drawProds(){
   var q=($$("qProd").value||"").toLowerCase().trim();
   var list=PRODS.filter(function(p){
-    return !q||
-      (p.nombre||"").toLowerCase().indexOf(q)>-1||
-      (p.codigo||"").toLowerCase().indexOf(q)>-1||
-      (p.categoria||"").toLowerCase().indexOf(q)>-1;
+    return !q||(p.nombre||"").toLowerCase().indexOf(q)>-1||(p.codigo||"").toLowerCase().indexOf(q)>-1||(p.categoria||"").toLowerCase().indexOf(q)>-1;
   });
   if(!list.length){
-    $$("listProd").innerHTML='<div class="empty">📦 No hay productos aún.<br><br><button onclick="openProdForm()" style="background:var(--teal);color:#fff;border:none;border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px">+ Agregar primer producto</button></div>';
+    $$("listProd").innerHTML='<div class="empty">📦 No hay productos aún.<br><br><button onclick="openProdForm()" style="background:var(--acc);color:#fff;border:none;border-radius:11px;padding:12px 20px;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px">+ Agregar primer producto</button></div>';
     return;
   }
   $$("listProd").innerHTML='<div class="prod-grid">'+list.map(function(p){
-    var imgHtml=p.imagen
-      ?'<img src="'+p.imagen+'" onerror="this.outerHTML=\'📕\'" referrerpolicy="no-referrer"/>'
-      :'📕';
+    var imgHtml=p.imagen?'<img src="'+esc(p.imagen)+'" onerror="this.outerHTML=\'📕\'" referrerpolicy="no-referrer"/>':'📕';
     return '<div class="prod-card">'+
       '<div class="prod-card-img">'+imgHtml+'</div>'+
       '<div class="prod-card-body">'+
-        '<div class="prod-card-name">'+(p.nombre||"Sin nombre")+'</div>'+
-        '<div class="prod-card-sub">'+(p.categoria||"")+(p.codigo?' · '+p.codigo:'')+'</div>'+
+        '<div class="prod-card-name">'+esc(p.nombre||"Sin nombre")+'</div>'+
+        '<div class="prod-card-sub">'+esc(p.categoria||"")+(p.codigo?' · '+esc(p.codigo):'')+'</div>'+
         '<div class="prod-card-price">'+money(p.precio||0)+'</div>'+
         '<div class="prod-card-btns">'+
           '<button class="prod-btn edit" onclick="openProdForm(\''+p.id+'\')">✏️ Editar</button>'+
@@ -626,24 +829,18 @@ function drawProds(){
 function openProdForm(id){
   editProdId=id||null;
   $$("pfTitle").textContent=id?"Editar Producto":"Agregar Producto";
-  // Limpiar campos
   $$("pfImg").value="";$$("pfCodigo").value="";$$("pfNombre").value="";
   $$("pfDesc").value="";$$("pfCat").value="";
   $$("pfPrecio").value="";$$("pfPrecio2").value="";$$("pfPrecio3").value="";
   $$("pfStock").value="";
   $$("pfImgPrev").innerHTML="📕";
-
   if(id){
     var p=PRODS.find(function(x){return x.id===id;});
     if(p){
-      $$("pfImg").value=p.imagen||"";
-      $$("pfCodigo").value=p.codigo||"";
-      $$("pfNombre").value=p.nombre||"";
-      $$("pfDesc").value=p.descripcion||"";
-      $$("pfCat").value=p.categoria||"";
-      $$("pfPrecio").value=p.precio||"";
-      $$("pfPrecio2").value=p.precio2||"";
-      $$("pfPrecio3").value=p.precio3||"";
+      $$("pfImg").value=p.imagen||"";$$("pfCodigo").value=p.codigo||"";
+      $$("pfNombre").value=p.nombre||"";$$("pfDesc").value=p.descripcion||"";
+      $$("pfCat").value=p.categoria||"";$$("pfPrecio").value=p.precio||"";
+      $$("pfPrecio2").value=p.precio2||"";$$("pfPrecio3").value=p.precio3||"";
       $$("pfStock").value=p.stock||"";
       if(p.imagen)previewImg(p.imagen);
     }
@@ -656,7 +853,7 @@ function closeProdForm(){$$("pfOverlay").classList.remove("open");editProdId=nul
 function previewImg(url){
   var prev=$$("pfImgPrev");
   if(!url){prev.innerHTML="📕";return;}
-  prev.innerHTML='<img src="'+url+'" onerror="this.parentElement.innerHTML=\'📕\'" referrerpolicy="no-referrer"/>';
+  prev.innerHTML='<img src="'+esc(url)+'" onerror="this.parentElement.innerHTML=\'📕\'" referrerpolicy="no-referrer"/>';
 }
 
 function saveProd(){
@@ -664,7 +861,6 @@ function saveProd(){
   if(!nombre){alert("El nombre es obligatorio");return;}
   var precio=parseFloat($$("pfPrecio").value)||0;
   if(!precio){alert("El precio es obligatorio");return;}
-
   var _prev = editProdId ? (PRODS.find(function(x){return x.id===editProdId;})||{}) : {};
   var data={
     nombre:nombre,
@@ -678,16 +874,12 @@ function saveProd(){
     stock:parseInt($$("pfStock").value)||0,
     imagen:$$("pfImg").value.trim()
   };
-
   var btn=$$("pfOverlay").querySelector(".pf-save");
   btn.textContent="Guardando...";btn.disabled=true;
-
-  var promise=editProdId
-    ?supaUpdate("productos","id=eq."+editProdId,data)
-    :supaInsert("productos",data);
-
+  var promise=editProdId?supaUpdate("productos","id=eq."+editProdId,data):supaInsert("productos",data);
   promise.then(function(){
     closeProdForm();
+    btn.textContent="💾 Guardar";btn.disabled=false;
     loadProductos();
     actualizarCatalogoStorage(data, editProdId);
   }).catch(function(e){
@@ -721,37 +913,30 @@ function importProds(event){
     if(!window.confirm("Se importarán "+arr.length+" productos. ¿Continuar?"))return;
     var items=[];
     arr.forEach(function(item){
-      // Soporta formato compacto {k,t,a,c,p,i} y formato completo
       var nombre=(item.t||item.nombre||item.titulo||"").toString().trim();
       if(!nombre)return;
       items.push({
-        nombre:nombre,
-        autor:(item.a||item.autor||"").toString().trim(),
+        nombre:nombre,autor:(item.a||item.autor||"").toString().trim(),
         codigo:(item.k||item.codigo||item.code||"").toString().trim(),
         descripcion:(item.descripcion||item.description||"").toString().trim(),
         categoria:(item.c||item.categoria||"General").toString().trim(),
         precio:parseFloat(item.p||item.precio||item.price||0),
-        precio2:parseFloat(item.precio2||0),
-        precio3:parseFloat(item.precio3||0),
+        precio2:parseFloat(item.precio2||0),precio3:parseFloat(item.precio3||0),
         stock:parseInt(item.stock||0),
         imagen:(item.i||item.imagen||item.img||item.portada||"").toString().trim()
       });
     });
-    // Insert in batches of 100
     var batches=[];
     for(var i=0;i<items.length;i+=100)batches.push(items.slice(i,i+100));
     Promise.all(batches.map(function(b){return supaInsert("productos",b);}))
-      .then(function(){
-        alert("✅ "+items.length+" productos importados correctamente.");
-        loadProductos();
-      }).catch(function(e){alert("Error: "+e);});
+      .then(function(){alert("✅ "+items.length+" productos importados correctamente.");loadProductos();})
+      .catch(function(e){alert("Error: "+e);});
   };
   reader.readAsText(file);
   event.target.value="";
 }
 
 function publicarCatalogo(){
-  // Trigger file picker for products.json
   document.getElementById("pubFileInput").click();
 }
 
@@ -774,40 +959,32 @@ function subirCatalogo(input){
   input.value="";
 }
 
-var IMGBB_KEY = "684f1dff43d2aef1692a53228e867ead";
-function uploadImg(input) {
-  var file = input.files[0];
-  if (!file) return;
-  if (file.size > 10*1024*1024) { alert("Imagen muy grande, máximo 10MB"); return; }
-  var txt = $$("imgUploadTxt"), btn = $$("imgUploadBtn"), status = $$("imgUploadStatus");
-  txt.textContent = "Subiendo..."; btn.style.opacity = "0.7"; btn.style.pointerEvents = "none";
-  status.style.display = "block"; status.textContent = "⏳ Subiendo imagen..."; status.style.color = "var(--gray)";
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    var base64 = e.target.result.split(",")[1];
-    var fd = new FormData(); fd.append("image", base64); fd.append("key", IMGBB_KEY);
-    fetch("https://api.imgbb.com/1/upload", { method:"POST", body:fd })
-      .then(function(r) { return r.json(); })
-      .then(function(data) {
-        if (data.success) {
-          $$("pfImg").value = data.data.url;
-          previewImg(data.data.url);
-          status.textContent = "✅ Imagen subida correctamente";
-          status.style.color = "#1a7a4a";
-        } else {
-          status.textContent = "❌ Error al subir imagen";
-          status.style.color = "var(--red)";
-        }
+var IMGBB_KEY="684f1dff43d2aef1692a53228e867ead";
+function uploadImg(input){
+  var file=input.files[0];
+  if(!file)return;
+  if(file.size>10*1024*1024){alert("Imagen muy grande, máximo 10MB");return;}
+  var txt=$$("imgUploadTxt"),btn=$$("imgUploadBtn"),status=$$("imgUploadStatus");
+  txt.textContent="Subiendo...";btn.style.opacity="0.7";btn.style.pointerEvents="none";
+  status.style.display="block";status.textContent="⏳ Subiendo imagen...";status.style.color="var(--gray)";
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var base64=e.target.result.split(",")[1];
+    var fd=new FormData();fd.append("image",base64);fd.append("key",IMGBB_KEY);
+    fetch("https://api.imgbb.com/1/upload",{method:"POST",body:fd})
+      .then(function(r){return r.json();})
+      .then(function(data){
+        if(data.success){$$("pfImg").value=data.data.url;previewImg(data.data.url);status.textContent="✅ Imagen subida correctamente";status.style.color="#1a7a4a";}
+        else{status.textContent="❌ Error al subir imagen";status.style.color="var(--red)";}
       })
-      .catch(function() { status.textContent = "❌ Error de conexión"; status.style.color = "var(--red)"; })
-      .finally(function() { txt.textContent = "Subir foto"; btn.style.opacity = "1"; btn.style.pointerEvents = "auto"; input.value = ""; });
+      .catch(function(){status.textContent="❌ Error de conexión";status.style.color="var(--red)";})
+      .finally(function(){txt.textContent="Subir foto";btn.style.opacity="1";btn.style.pointerEvents="auto";input.value="";});
   };
   reader.readAsDataURL(file);
 }
 
 function actualizarCatalogoStorage(productoGuardado, esEdicion){
   var url = "https://nmetrjlkxfgikemrllqf.supabase.co/storage/v1/object/public/catalogo/products.json";
-  // Descargar el products.json actual
   fetch(url+"?t="+Date.now())
     .then(function(r){ return r.json(); })
     .then(function(arr){
@@ -821,12 +998,10 @@ function actualizarCatalogoStorage(productoGuardado, esEdicion){
         i:productoGuardado.imagen||""
       };
       if(esEdicion){
-        // Reemplazar el existente por código
         var idx = arr.findIndex(function(x){ return x.k===nuevoProducto.k; });
         if(idx>=0) arr[idx]=nuevoProducto;
         else arr.push(nuevoProducto);
       } else {
-        // Verificar que no exista ya
         var existe = arr.some(function(x){ return x.k===nuevoProducto.k; });
         if(!existe) arr.push(nuevoProducto);
       }
