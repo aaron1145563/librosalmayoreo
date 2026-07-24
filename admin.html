@@ -582,7 +582,11 @@ function startFB(){
 
 function loadPedidos(){
   supaGet("pedidos","?order=creado_en.desc").then(function(data){
-    if(!Array.isArray(data))return;
+   try{
+    if(!Array.isArray(data)){
+      $$("listP").innerHTML='<div class="empty" style="color:var(--red)">No se pudieron cargar los pedidos.<br><small>'+esc(JSON.stringify(data)).slice(0,300)+'</small></div>';
+      return;
+    }
     PEDS=data;
     var nv=PEDS.filter(function(p){return p.estado==="nuevo";}).length;
     if(lastN!==null&&nv>lastN){
@@ -593,7 +597,7 @@ function loadPedidos(){
     lastN=nv;
     $$("sP").textContent=PEDS.length;
     $$("sNsub").textContent=nv>0?(nv+" nuevo"+(nv!==1?"s":"")):"";
-    var cli={};PEDS.forEach(function(p){cli[(p.email||p.cliente||"").toLowerCase()]=1;});
+    var cli={};PEDS.forEach(function(p){cli[String(p.email||p.cliente||"").toLowerCase()]=1;});
     $$("sC").textContent=Object.keys(cli).length;
     var now=new Date(),mesTot=0;
     PEDS.forEach(function(p){var d=new Date(p.creado_en||p.creadoEn);if(d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear())mesTot+=p.total||0;});
@@ -603,6 +607,11 @@ function loadPedidos(){
       if(d&&d[0])$$("sV").textContent=(d[0].visitas||0).toLocaleString("es-MX");
     });
     draw();
+   }catch(err){
+    $$("listP").innerHTML='<div class="empty" style="color:var(--red)">⚠️ Error al procesar pedidos:<br><b>'+esc(err.message)+'</b></div>';
+   }
+  }).catch(function(e){
+    $$("listP").innerHTML='<div class="empty" style="color:var(--red)">⚠️ Error de conexión: '+esc(e.message)+'</div>';
   });
 }
 
@@ -640,7 +649,7 @@ function draw(){
   if(tab==="prod"){drawProds();return;}
   var q=$$("q").value.toLowerCase(),est=$$("est").value;
   var list=PEDS.filter(function(p){
-    return(!q||(p.cliente||"").toLowerCase().indexOf(q)>-1||(p.codigo||"").toLowerCase().indexOf(q)>-1)&&(!est||p.estado===est);
+    return(!q||String(p.cliente||"").toLowerCase().indexOf(q)>-1||String(p.codigo||"").toLowerCase().indexOf(q)>-1)&&(!est||p.estado===est);
   });
   if(!list.length){$$("listP").innerHTML='<div class="empty">No hay pedidos.</div>';return;}
   $$("listP").innerHTML=list.map(function(p){
@@ -701,11 +710,11 @@ function draw(){
 function drawC(){
   var q=$$("qC")?$$("qC").value.toLowerCase():"",map={};
   PEDS.forEach(function(p){
-    var k=(p.email||p.cliente||"").toLowerCase();
+    var k=String(p.email||p.cliente||"").toLowerCase();
     if(!map[k])map[k]={nombre:p.cliente,email:p.email||"",tel:p.telefono||"",peds:[],total:0};
     map[k].peds.push(p);map[k].total+=p.total||0;
   });
-  var list=Object.values(map).filter(function(c){return!q||c.nombre.toLowerCase().indexOf(q)>-1||c.email.toLowerCase().indexOf(q)>-1;}).sort(function(a,b){return b.total-a.total;});
+  var list=Object.values(map).filter(function(c){return!q||String(c.nombre||"").toLowerCase().indexOf(q)>-1||String(c.email||"").toLowerCase().indexOf(q)>-1;}).sort(function(a,b){return b.total-a.total;});
   if(!list.length){$$("listC").innerHTML='<div class="empty">No hay clientes.</div>';return;}
   $$("listC").innerHTML=list.map(function(c){
     var hist=c.peds.map(function(p){
