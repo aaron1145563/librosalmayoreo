@@ -644,8 +644,9 @@ function draw(){
   });
   if(!list.length){$$("listP").innerHTML='<div class="empty">No hay pedidos.</div>';return;}
   $$("listP").innerHTML=list.map(function(p){
-    var tel=(p.telefono||"").replace(/[^0-9]/g,"");
-    var est=p.estado||"nuevo";
+   try{
+    var tel=String(p.telefono||"").replace(/[^0-9]/g,"");
+    var est=String(p.estado||"nuevo");
     var lbl=est==="nuevo"?"PENDIENTE":est.toUpperCase();
     var wm=encodeURIComponent("Hola "+p.cliente+", te contactamos de Libros al Mayoreo sobre tu pedido "+p.codigo);
     var lvl=est==="entregado"?2:est==="despachado"?1:0;
@@ -685,6 +686,14 @@ function draw(){
         '<button class="act del" onclick="delP(\''+p.id+'\')" title="Eliminar"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>'+
       '</div>'+
     '</div>';
+   }catch(err){
+    return '<div class="order"><div class="o-top"><div><div class="o-name">'+esc(p.cliente||"Pedido")+'</div>'+
+      '<div class="o-meta">#'+esc(p.codigo||"")+' · '+fmtD(p.creado_en||p.creadoEn)+'</div></div>'+
+      '<span class="o-badge '+String(p.estado||"nuevo")+'">'+String(p.estado||"nuevo").toUpperCase()+'</span></div>'+
+      '<div class="o-total-row"><span class="lbl">Total</span><span class="amt">'+money(p.total)+'</span></div>'+
+      '<div class="o-acts"><button class="act pr" onclick="openD(\''+p.id+'\',\'ver\')" title="Ver pedido"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>'+
+      '<button class="act del" onclick="delP(\''+p.id+'\')" title="Eliminar"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button></div></div>';
+   }
   }).join("");
 }
 
@@ -700,7 +709,7 @@ function drawC(){
   if(!list.length){$$("listC").innerHTML='<div class="empty">No hay clientes.</div>';return;}
   $$("listC").innerHTML=list.map(function(c){
     var hist=c.peds.map(function(p){
-      var est=p.estado||"nuevo",lbl=est==="nuevo"?"PENDIENTE":est.toUpperCase();
+      var est=String(p.estado||"nuevo"),lbl=est==="nuevo"?"PENDIENTE":est.toUpperCase();
       return '<div class="cli-hist">'+
         '<div><b>#'+esc(p.codigo)+'</b> <span style="color:var(--gray-l);font-style:italic">· '+fmtD(p.creado_en||p.creadoEn)+'</span></div>'+
         '<div style="display:flex;gap:10px;align-items:center"><span class="o-badge '+est+'">'+lbl+'</span><b>'+money(p.total)+'</b></div></div>';
@@ -744,7 +753,7 @@ function finalizar(){
   supaUpdate("pedidos","id=eq."+detId,upd).then(function(){
     closeDetail();loadPedidos();
     if(p&&p.telefono&&(detMode==="despachado"||detMode==="entregado")){
-      var tel=(p.telefono||"").replace(/[^0-9]/g,"");
+      var tel=String(p.telefono||"").replace(/[^0-9]/g,"");
       var sub=p.total||0,tot=sub+envio;
       var EB="📦",EK="📚",EC="✅",msg;
       if(detMode==="despachado"){
